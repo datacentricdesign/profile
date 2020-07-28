@@ -1,5 +1,5 @@
 {
-  "name": "profile-ui",
+  "name": "@datacentricdesign/profile-ui",
   "version": "0.0.1",
   "license": "MIT",
   "description": "Web front-end of profile, an Identity and Access Manager (IAM) for the data-centric design tools.",
