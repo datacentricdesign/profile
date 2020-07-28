@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DTOPerson } from '../../../../../profile-api/types'
+import { DTOPerson } from '@datacentricdesign/types'
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';

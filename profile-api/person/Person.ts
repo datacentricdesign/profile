@@ -7,7 +7,7 @@ import {
     UpdateDateColumn, OneToMany, PrimaryColumn, JoinColumn
 } from "typeorm";
 
-import { Person as IPerson } from "../types";
+import { Person as IPerson } from "@datacentricdesign/types";
 
 /**
  * A Person represents a physical person

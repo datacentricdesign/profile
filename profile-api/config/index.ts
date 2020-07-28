@@ -5,7 +5,7 @@ import { envConfig } from "./envConfig";
 import { ORMConfig } from "./ormConfig";
 import { httpConfig } from "./httpConfig";
 import { authConfig } from './authConfig';
-import { Context } from '../types';
+import { Context } from '@datacentricdesign/types';
 
 function validateEnv() {
   cleanEnv(process.env, {

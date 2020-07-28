@@ -1,7 +1,7 @@
 {
   "name": "profile-api",
   "version": "0.0.1",
-  "description": "User management of the Data-Centric Design tools",
+  "description": "REST API of profile, an Identity and Access Manager (IAM) for the data-centric design tools.",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/datacentricdesign/profile#readme",
   "dependencies": {
+    "@datacentricdesign/types": "0.0.1",
     "@types/express-session": "^1.17.0",
     "apidoc": "^0.23.0",
     "body-parser": "^1.19.0",

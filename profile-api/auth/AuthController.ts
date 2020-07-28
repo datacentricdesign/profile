@@ -5,7 +5,7 @@ import { PersonService } from "../person/PersonService"
 
 import { hydra } from "./hydra"
 import config from "../config";
-import { DTOPerson } from "../types";
+import { DTOPerson } from "@datacentricdesign/types";
 
 // Read scopes
 import * as fs from "fs";

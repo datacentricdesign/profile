@@ -6,8 +6,7 @@ import { PolicyService } from "./PolicyService";
 
 import { v4 as uuidv4 } from 'uuid';
 import { envConfig } from "../config/envConfig";
-import { DCDError } from "../types/DCDError";
-import { DTOPerson } from "../types";
+import { DCDError, DTOPerson } from "@datacentricdesign/types";
 
 const PG_UNIQUE_CONSTRAINT_VIOLATION = "23505";
 
