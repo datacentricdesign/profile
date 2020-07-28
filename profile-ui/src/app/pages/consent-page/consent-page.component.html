@@ -1,0 +1,119 @@
+<style>
+    /* Tooltip container */
+    .tooltipinfo {
+        position: relative;
+        display: inline-block;
+        margin-left: 5px;
+    }
+
+    /* Tooltip text */
+    .tooltipinfo .tooltipinfotext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+
+        /* Position the tooltip text */
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+
+        /* Fade in tooltip */
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    /* Tooltip arrow */
+    .tooltipinfo .tooltipinfotext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltipinfo:hover .tooltipinfotext {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+<div class="wrapper">
+    <div class="main-panel" style="width: 100%;">
+        <div class="content" style="min-height:calc(100vh - 165px);;">
+            <form #consentForm="ngForm" *ngIf="auth$ | async as data else noData">
+                <input type="hidden" name="challenge" value=challenge>
+                <input type="hidden" name="scopes" value=scopes>
+                <input type="hidden" name="_csrf" value=csrfToken>
+                <div class="card card-stats" style="max-width: 500px;margin:auto">
+                    <div class="card-header" style="text-align:center;">
+                        <span *ngIf="data.client.logo_uri !== ''">
+                            <img src="{{data.client.logo_uri}}" style="max-width: 150px;" />
+                        </span>
+                        <p>
+                            Hi {{user.name}}, the application <b>{{client.client_name || client.client_id}}</b> requests
+                            <br>
+                            the following access to your data!
+                        </p>
+                        <a *ngIf="client!==undefined && client.policy_uri!==''"
+                            href="{{client.policy_uri}}">Policy</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}">Terms of
+                            Service</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.contacts!==''"
+                            href="mailto:{{client.contacts[0]}}">Contact</a>
+                    </div>
+                    <div class="card-body">
+                        <span *ngIf="client!==undefined && user!==undefined">
+                            <p>
+                                {{client.client_description}}
+                            </p>
+                            <p>
+                                <b>{{client.client_name || client.id}}</b> wants
+                                access resources on your behalf to:
+                            </p>
+                        </span>
+
+                        <div *ngIf="requested_scope !== undefined"
+                            style="border: 1px #AAA solid; border-radius: 6px; padding: 10px;max-width:200px;margin:10px auto">
+                            <div *ngFor="let scope of requested_scope">
+                                <input type="checkbox" id={{scope}} value={{scope.id}} name="grant_scope"
+                                    checked="checked" disabled="true">
+                                <label for="{{scope.name}}" style="padding-left:5px">{{scope.name}}</label>
+                                <span class="description">
+                                    <i class="nc-icon nc-alert-circle-i tooltipinfo">
+                                        <span class="tooltipinfotext">{{scope.desc}}</span>
+                                    </i>
+                                </span>
+                            </div>
+                        </div>
+                        <p>
+                            <input type="checkbox" id="remember" name="remember" value="true" [(ngModel)]="model.remember"  #remember="ngModel">
+                            <label for="remember" style="padding-left:5px">Do not ask me again</label>
+                            <i class="nc-icon nc-alert-circle-i tooltipinfo">
+                                <span class="tooltipinfotext">Do you want to be asked next time when this application wants to access your data?
+                                    The application will not be able to ask for more permissions without your consent.</span>
+                            </i>
+                        </p>
+                    </div>
+                    <div class="card-footer ">
+                        <hr>
+                        <input type="hidden" name="user" value={{user}}>
+                        <input type="submit" name="submit" value="Allow Access" class="btn btn-success" (click)="postConsent('Allow Access')">&nbsp;
+                        <input type="submit" name="submit" value="Deny access" class="btn btn-danger" (click)="postConsent('Deny access')">
+                    </div>
+                </div>
+            </form>
+
+            <ng-template #noData>Waiting for the identity provider...</ng-template>
+        </div>
+        <footer-cmp></footer-cmp>
+    </div>
+</div>

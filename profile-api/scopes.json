@@ -1,0 +1,47 @@
+{
+  "dcd:public": {
+    "id": "dcd:public",
+    "name": "Access Public Data",
+    "desc": "Access anything public on the DCD Hub."
+  },
+  "dcd:things": {
+    "id": "dcd:things",
+    "name": "Access Things",
+    "desc": "Access the details of Things I am allowed to access."
+  },
+  "dcd:persons": {
+    "id": "dcd:persons",
+    "name": "Access Persons",
+    "desc": "Access the details of Persons I am allowed to access."
+  },
+  "openid": {
+    "id": "openid",
+    "name": "OpenID",
+    "desc": "Authenticate via my DCD Lab account."
+  },
+  "offline": {
+    "id": "offline",
+    "name": "Offline",
+    "desc": "Renew DCD Lab access automatically (i.e. keep me signed in)."
+  },
+  "profile": {
+    "id": "profile",
+    "name": "Profile",
+    "desc": "Access my profile information and preferences. If available: my name, picture or avatar, website, gender, date of birth, timezone and locale preferences."
+  },
+  "email": {
+    "id": "email",
+    "name": "Email",
+    "desc": "Access my email address and its verification status."
+  },
+  "phone": {
+    "id": "phone",
+    "name": "Phone",
+    "desc": "Access my phone number and its verification status."
+  },
+  "address": {
+    "id": "address",
+    "name": "Address",
+    "desc": "Access my address information."
+  }
+}
