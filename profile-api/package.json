@@ -1,15 +1,15 @@
 {
   "name": "@datacentricdesign/profile-api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "REST API of profile, an Identity and Access Manager (IAM) for the data-centric design tools.",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./index.ts",
-    "prod": "tsc && node ./build/app.js",
-    "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./config/ormConfig.ts",
+    "start": "npm run migration:run && set debug=* && ts-node-dev --respawn --transpileOnly ./index.ts",
+    "prod": "npm run migration:run && tsc && node ./build/index.js",
+    "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./config/ormMigrationWrap.ts",
     "migration:run": "npm run typeorm:cli migration:run",
-    "doc": "apidoc -i things/ThingRouter.ts -o dist/public/docs/"
+    "doc": "apidoc -i person/PersonRouter.ts -o dist/public/docs/"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,6 @@
   "homepage": "https://github.com/datacentricdesign/profile#readme",
   "dependencies": {
     "@datacentricdesign/types": "0.0.2",
-    "@types/express-session": "^1.17.0",
     "apidoc": "^0.23.0",
     "body-parser": "^1.19.0",
     "class-validator": "^0.12.2",
@@ -42,6 +41,8 @@
     "uuid": "^8.1.0"
   },
   "devDependencies": {
+    "@types/express-session": "^1.17.0",
+    "@types/node": "^14.0.27",
     "@types/body-parser": "^1.19.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.6",
