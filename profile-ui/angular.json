@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "pd-free-angularcli": {
+    "profile-angularcli": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -50,18 +50,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "pd-free-angularcli:build"
+            "browserTarget": "profile-angularcli:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "pd-free-angularcli:build:production"
+              "browserTarget": "profile-angularcli:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "pd-free-angularcli:build"
+            "browserTarget": "profile-angularcli:build"
           }
         },
         "test": {
@@ -90,18 +90,22 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
+            "eslintConfig": ".eslintrc.js",
             "tsConfig": [
               "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
+              "src/tsconfig.spec.json",
+              "e2e/tsconfig.json"
             ],
-            "exclude": []
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     },
-    "pd-free-angularcli-e2e": {
+    "profile-e2e": {
       "root": "e2e",
       "sourceRoot": "e2e",
       "projectType": "application",
@@ -110,22 +114,13 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "pd-free-angularcli:serve"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "e2e/tsconfig.e2e.json"
-            ],
-            "exclude": []
+            "devServerTarget": "profile-angularcli:serve"
           }
         }
       }
     }
   },
-  "defaultProject": "pd-free-angularcli",
+  "defaultProject": "profile-angularcli",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
