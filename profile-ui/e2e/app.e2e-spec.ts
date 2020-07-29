@@ -1,6 +1,6 @@
 import { PdFreeAngularcliPage } from './app.po';
 
-describe('pd-free-angularcli App', () => {
+describe('profile-angularcli App', () => {
   let page: PdFreeAngularcliPage;
 
   beforeEach(() => {
