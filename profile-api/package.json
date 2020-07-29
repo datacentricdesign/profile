@@ -1,12 +1,12 @@
 {
   "name": "@datacentricdesign/profile-api",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "REST API of profile, an Identity and Access Manager (IAM) for the data-centric design tools.",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
     "start": "npm run migration:run && set debug=* && ts-node-dev --respawn --transpileOnly ./index.ts",
-    "prod": "npm run migration:run && tsc && node ./build/index.js",
+    "prod": "npm run migration:run && tsc && node ./dist/index.js",
     "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ./config/ormMigrationWrap.ts",
     "migration:run": "npm run typeorm:cli migration:run",
     "doc": "apidoc -i person/PersonRouter.ts -o dist/public/docs/"
