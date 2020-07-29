@@ -12,4 +12,8 @@ export class LandingPageComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  public login() { }
+
+  public signup() { }
+
 }

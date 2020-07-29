@@ -8,10 +8,10 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ErrorPageComponent implements OnInit {
 
-  private type: string
-  private debug: string
-  private description: string
-  private hint: string
+  public type: string
+  public debug: string
+  public description: string
+  public hint: string
 
   constructor(private route: ActivatedRoute) { }
 
