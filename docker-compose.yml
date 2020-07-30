@@ -3,7 +3,9 @@ version: '3'
 services:
 
   profile-api:
-    image: datacentricdesign/profile-api:release-0.0.5
+    image: datacentricdesign/profile-api:release-0.0.6
+    # build:
+    #   context: ./profile-api
     container_name: profile-api
     environment: 
       - HOST_DATA_FOLDER=$HOST_DATA_FOLDER
@@ -36,10 +38,13 @@ services:
       - OAUTH2_CLIENT_SECRET=$OAUTH2_CLIENT_SECRET
       - OAUTH2_SCOPE=$OAUTH2_SCOPE
 
+      - HYDRA_ADMIN_URL=$HYDRA_ADMIN_URL
+      - FIRST_PARTY_APPS=$FIRST_PARTY_APPS
+
       - ACP_URL=$KETO_URL
 
   profile-ui:
-    image: datacentricdesign/profile-ui:release-0.0.5
+    image: datacentricdesign/profile-ui:release-0.0.6
     container_name: profile-ui
     environment:
      - NGINX_HOST=dwd.tudelft.nl
