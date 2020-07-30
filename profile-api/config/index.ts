@@ -37,7 +37,6 @@ function validateEnv() {
     OAUTH2_CLIENT_SECRET: str(),
     OAUTH2_SCOPE: str(),
     FIRST_PARTY_APPS: str(),
-    HYDRA_ADMIN_URL: str(),
     ACP_URL: url(),
   });
 
