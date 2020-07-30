@@ -1,6 +1,6 @@
 # [Profile](https://datacentricdesign.org/tools/profile)
 
-![version](https://img.shields.io/badge/version-0.0.5-blue.svg)
+![version](https://img.shields.io/badge/version-0.0.6-blue.svg)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 [![GitHub issues open](https://img.shields.io/github/issues/datacentricdesign/profile.svg?maxAge=2592000)]()

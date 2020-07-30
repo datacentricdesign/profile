@@ -1,6 +1,6 @@
 {
   "name": "@datacentricdesign/profile-api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "REST API of profile, an Identity and Access Manager (IAM) for the data-centric design tools.",
   "main": "dist/index.js",
   "scripts": {
