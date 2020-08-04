@@ -54,8 +54,8 @@ function startAPI() {
     app.use(cookieParser());
 
     // Set all routes from routes folder
-    app.use("/persons", PersonRouter);
-    app.use("/auth", AuthRouter);
+    app.use(config.http.baseUrl + "/persons", PersonRouter);
+    app.use(config.http.baseUrl + "/auth", AuthRouter);
     app.use(errorMiddleware)
 
     // Start listening
