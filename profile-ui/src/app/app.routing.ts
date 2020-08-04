@@ -10,11 +10,11 @@ import { ErrorPageComponent } from './pages/error-page/error-page.component';
 
 export const AppRoutes: Routes = [
   { path: '', component: LandingPageComponent },
-  { path: 'signin', component: SignInPageComponent },
-  { path: 'signup', component: SignUpPageComponent },
-  { path: 'signout', component: SignOutPageComponent },
-  { path: 'consent', component: ConsentPageComponent },
-  { path: 'error', component: ErrorPageComponent },
+  { path: 'signin.html', component: SignInPageComponent },
+  { path: 'signup.html', component: SignUpPageComponent },
+  { path: 'signout.html', component: SignOutPageComponent },
+  { path: 'consent.html', component: ConsentPageComponent },
+  { path: 'error.html', component: ErrorPageComponent },
   {
     path: '',
     component: AdminLayoutComponent,
