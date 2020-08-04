@@ -3,9 +3,9 @@ version: '3'
 services:
 
   profile-api:
-    image: datacentricdesign/profile-api:release-0.0.6
-    # build:
-    #   context: ./profile-api
+    # image: datacentricdesign/profile-api:release-0.0.6
+    build:
+      context: ./profile-api
     container_name: profile-api
     environment: 
       - HOST_DATA_FOLDER=$HOST_DATA_FOLDER
@@ -44,7 +44,9 @@ services:
       - ACP_URL=$KETO_URL
 
   profile-ui:
-    image: datacentricdesign/profile-ui:release-0.0.6
+    # image: datacentricdesign/profile-ui:release-0.0.6
+    build:
+      context: ./profile-ui
     container_name: profile-ui
     environment:
      - NGINX_HOST=dwd.tudelft.nl
