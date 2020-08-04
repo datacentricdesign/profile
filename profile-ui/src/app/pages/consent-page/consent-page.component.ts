@@ -38,7 +38,7 @@ export class ConsentPageComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       console.log(params)
       this.consent_challenge = params["consent_challenge"]
-      this.auth$ = this.http.get<any>(this._router.url + "/profile/consent.html?consent_challenge=" + this.consent_challenge).pipe(
+      this.auth$ = this.http.get<any>(this._router.url + "/profile/api/auth/consent?consent_challenge=" + this.consent_challenge).pipe(
         map((data: any) => {
           console.log(data)
           this.csrf = data.csrfToken
@@ -55,7 +55,7 @@ export class ConsentPageComponent implements OnInit {
   }
 
   postConsent(value:string): void {
-    this.http.post(this._router.url + "/profile/consent.html?consent_challenge=" + this.consent_challenge + "&_csrf=" + this.csrf, {
+    this.http.post(this._router.url + "/profile/api/auth/consent?consent_challenge=" + this.consent_challenge + "&_csrf=" + this.csrf, {
       _csrf: this.csrf,
       challenge: this.consent_challenge,
       scopes: this.scopes,

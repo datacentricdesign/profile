@@ -36,7 +36,7 @@ export class SignUpPageComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       console.log(params)
       this.login_challenge = params["login_challenge"]
-      this.auth$ = this.http.get<any>(this._router.url + "/profile/signup.html?login_challenge=" + params["login_challenge"]).pipe(
+      this.auth$ = this.http.get<any>(this._router.url + "/profile/api/auth/signup?login_challenge=" + params["login_challenge"]).pipe(
         map((data: any) => {
           console.log(data)
           this.csrf = data.csrfToken
@@ -50,7 +50,7 @@ export class SignUpPageComponent implements OnInit {
   }
 
   postSignUp(): void {
-    this.http.post(this._router.url + "/profile/signup.html?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf, {
+    this.http.post(this._router.url + "/profile/api/auth/signup?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf, {
       email: this.model.email,
       password: this.model.password,
       name: this.model.name,
