@@ -24,6 +24,6 @@ COPY ./.nginx/* /etc/nginx/
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy from the stahg 1
-COPY --from=builder /profile-ui/dist /usr/share/nginx/html
+COPY --from=builder /profile-ui/dist /usr/share/nginx/html/profile
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
