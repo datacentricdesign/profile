@@ -14,26 +14,3 @@
 User management of the Data-Centric Design tools
 
 [Profile page](https://datacentricdesign.org/profile)
-
-## Making a new release
-
-```
-git checkout -b release-0.0.x develop
-```
-
-Bumb versions: in readme, in both package.json, in docker-compose.yml
-
-```
-cd profile-ui
-npm publish
-cd profile-api
-npm publish
-git commit -a -m "Bumped version number to 0.0.x"
-git checkout master
-git merge --no-ff release-0.0.x
-git tag -a 0.0.x
-git push --follow-tags
-git checkout develop
-git merge --no-ff release-0.0.x
-git branch -d release-0.0.x
-```

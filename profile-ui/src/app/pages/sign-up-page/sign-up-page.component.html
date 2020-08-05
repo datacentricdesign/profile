@@ -8,7 +8,7 @@
                             <img src="{{client.logo_uri}}" style="max-width: 150px;" />
                             <i class="nc-icon nc-simple-add"></i>
                         </span>
-                        <img src="/assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
+                        <img src="./assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
                         <p *ngIf="client !== undefined">
                             Sign up for a Data-Centric Design Lab Account<br>
                             and log in on <b>{{client.client_name || client.client_id}}</b>
@@ -74,7 +74,7 @@
                         <input type="submit" id="submit" name="submit" value="Sign up" class="btn btn-info"
                             [disabled]="!signUpForm.form.valid">
                         <span style="float: right;text-align:right;padding-top: 5px;">
-                            Already a DCD Lab member? <a href="/signin?login_challenge={{login_challenge}}">Sign in</a>
+                            Already a DCD Lab member? <a href="./signin?login_challenge={{login_challenge}}">Sign in</a>
                         </span>
                     </div>
                 </div>
