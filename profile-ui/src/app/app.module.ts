@@ -1,5 +1,5 @@
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
-import { NgModule } from '@angular/core'
+import { NgModule, APP_INITIALIZER } from '@angular/core'
 import { RouterModule } from '@angular/router'
 import { ToastrModule } from "ngx-toastr"
 
@@ -24,6 +24,11 @@ import { SignUpPageComponent } from './pages/sign-up-page/sign-up-page.component
 import { SignOutPageComponent } from './pages/sign-out-page/sign-out-page.component';
 import { ConsentPageComponent } from './pages/consent-page/consent-page.component';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
+import { AppService } from './app.service'
+
+export function init_app(appService: AppService) {
+  return () => appService.load();
+}
 
 @NgModule({
   declarations: [
@@ -49,7 +54,12 @@ import { ErrorPageComponent } from './pages/error-page/error-page.component';
     MatDialogModule,
     FormsModule
   ],
-  providers: [],
+  providers: [{ 
+    provide: APP_INITIALIZER, 
+    useFactory: init_app, 
+    deps: [ AppService ], 
+    multi: true
+  }],
   bootstrap: [AppComponent],
   entryComponents: []
 })

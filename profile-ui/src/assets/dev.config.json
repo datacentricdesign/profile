@@ -1,0 +1,7 @@
+{
+    "name": "Profile",
+    "version": "0.0.1",
+    "environment": "development",
+    "basehref": "profile",
+    "apiURL": "http://localhost:8080"
+}

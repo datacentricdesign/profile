@@ -13,7 +13,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve -o",
+    "start": "ng serve --baseHref=http://localhost:4200/profile/ --deployUrl=/profile/ --serve-path=/profile/ -o",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
