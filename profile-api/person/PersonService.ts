@@ -10,6 +10,9 @@ import { DCDError, DTOPerson } from "@datacentricdesign/types";
 
 const PG_UNIQUE_CONSTRAINT_VIOLATION = "23505";
 
+import * as crypto from 'crypto'
+import config from "../config";
+
 export class PersonService {
 
     private static policyService = new PolicyService()
@@ -40,14 +43,15 @@ export class PersonService {
         person.id = personId,
         person.email = dtoPerson.email,
         person.name = dtoPerson.name,
-        person.password = dtoPerson.password
+        PersonService.validPassword(dtoPerson.password)
+        person.password = PersonService.encryptPassword(dtoPerson.password)
 
         // Try to retrieve Thing from the database
         try {
             const personRepository = getRepository(Person);
             await personRepository.save(person);
             await PersonService.policyService.grant(personId, personId, 'person');
-            return person;
+            return this.getOnePersonById(personId);
         } catch(error) {
             if (error.code === PG_UNIQUE_CONSTRAINT_VIOLATION) {
                 throw new DCDError(4002, '')
@@ -82,7 +86,7 @@ export class PersonService {
         let person = await personRepository
                                 .createQueryBuilder("person")
                                 .where("person.email = :personEmail AND person.password = :personPassword")
-                                .setParameters({ personEmail, personPassword })
+                                .setParameters({ personEmail, personPassword: PersonService.encryptPassword(personPassword) })
                                 .getOne()
         return person !== undefined ? person.id : undefined
     }
@@ -114,4 +118,30 @@ export class PersonService {
             return PersonService.policyService.revoke(personId, personId, 'person');
         });
     }
+
+    /**
+   * @param password plain text password
+   * @returns {string} encrypted password
+   */
+  static encryptPassword(password:string) {
+    return crypto
+      .createHmac(config.env.cryptoAlgo, config.env.cryptoKey)
+      .update(password)
+      .digest('hex')
+  }
+
+    /**
+     * @param {String} password
+     */
+    static validPassword(password:string) {
+    if (typeof password !== 'string') {
+      throw new DCDError(4001, 'The field \'password\' must be a string.')
+    }
+    if (password.length < 8) {
+      throw new DCDError(
+        4001,
+        'Password is too short. Provide a password with 8 characters or more.'
+      )
+    }
+  }
 }

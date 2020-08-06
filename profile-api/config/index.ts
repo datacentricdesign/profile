@@ -17,6 +17,8 @@ function validateEnv() {
     NODE_ENV: str(),
     DEV_USER: str(),
     DEV_TOKEN: str(),
+    CRYPTO_ALGO: str(),
+    CRYPTO_KEY: str(),
     // Postgres Settings
     PROFILE_POSTGRES_HOST: str(),
     PROFILE_POSTGRES_USER: str(),
