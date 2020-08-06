@@ -4,7 +4,7 @@
   "description": "REST API of profile, an Identity and Access Manager (IAM) for the data-centric design tools.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./index.ts",
+    "start": "ts-node-dev ./index.ts",
     "build": "tsc",
     "typeorm:cli": "node ./node_modules/typeorm/cli -f ./dist/config/ormMigrationWrap.js",
     "migration:run": "npm run typeorm:cli migration:run",
@@ -36,11 +36,12 @@
     "node-fetch": "2.6.0",
     "pg": "8.3.0",
     "postgres": "1.0.2",
-    "typeorm": "0.2.25",
-    "url-join": "4.0.1",
-    "uuid": "8.3.0",
+    "simple-oauth2": "^4.1.0",
     "ts-node": "8.10.2",
-    "typescript": "3.9.7"
+    "typeorm": "0.2.25",
+    "typescript": "3.9.7",
+    "url-join": "4.0.1",
+    "uuid": "8.3.0"
   },
   "devDependencies": {
     "@types/express-session": "1.17.0",

@@ -38,10 +38,10 @@ services:
       - OAUTH2_CLIENT_SECRET=$OAUTH2_CLIENT_SECRET
       - OAUTH2_SCOPE=$OAUTH2_SCOPE
 
-      - HYDRA_ADMIN_URL=$HYDRA_ADMIN_URL
-      - FIRST_PARTY_APPS=$FIRST_PARTY_APPS
+      - HYDRA_ADMIN_URL=$OAUTH2_HYDRA_ADMIN_URL
+      - FIRST_PARTY_APPS=$OAUTH2_FIRST_PARTY_APPS
 
-      - ACP_URL=$KETO_URL
+      - ACP_URL=$ACP_URL
 
   profile-ui:
     # image: datacentricdesign/profile-ui:release-0.0.6
@@ -62,6 +62,8 @@ services:
       - POSTGRES_DB=$PROFILE_POSTGRES_DB
     volumes:
       - $HOST_DATA_FOLDER/profile/profile-postgres:/var/lib/postgresql/data
+    ports:
+      - $PROFILE_POSTGRES_PORT:$PROFILE_POSTGRES_PORT
 
 networks: 
     default:

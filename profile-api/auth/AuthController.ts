@@ -10,10 +10,14 @@ import { DTOPerson } from "@datacentricdesign/types";
 // Read scopes
 import * as fs from "fs";
 import { AuthRouter } from "./AuthRouter";
+import { PolicyService } from "./services/PolicyService";
+import { AuthService } from "./services/AuthService";
 const scopeLib = JSON.parse(fs.readFileSync("scopes.json", "utf8"));
 
 export class AuthController {
 
+    static authService = new AuthService();
+    static policyService = new PolicyService();
     static personService = new PersonService();
 
     static apiHealth = async (req: Request, res: Response) => {
@@ -165,7 +169,7 @@ export class AuthController {
      * Sign up - Post info
      */
     static postSignUp = async (req: Request, res: Response, next: Function) => {
-        const url = process.env.API_URL + "/persons";
+        const url = config.http.url + "/persons";
         const person: DTOPerson = {
             email: req.body.email,
             name: req.body.name,

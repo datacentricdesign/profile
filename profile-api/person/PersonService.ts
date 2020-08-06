@@ -2,7 +2,7 @@
 import { getRepository, DeleteResult} from "typeorm";
 
 import { Person } from "./Person";
-import { PolicyService } from "./PolicyService";
+import { PolicyService } from "../auth/services/PolicyService";
 
 import { v4 as uuidv4 } from 'uuid';
 import { envConfig } from "../config/envConfig";
@@ -46,9 +46,7 @@ export class PersonService {
         try {
             const personRepository = getRepository(Person);
             await personRepository.save(person);
-            if (envConfig.env === 'production') {
-                await PersonService.policyService.grant(personId, personId, 'subject');
-            }
+            await PersonService.policyService.grant(personId, personId, 'person');
             return person;
         } catch(error) {
             if (error.code === PG_UNIQUE_CONSTRAINT_VIOLATION) {
@@ -112,6 +110,8 @@ export class PersonService {
         } catch (error) {
             throw new DCDError( 404, 'Person to delete ' + personId + ' could not be not found.')
         }
-        return personRepository.delete(personId);
+        return personRepository.delete(personId).then( () => {
+            return PersonService.policyService.revoke(personId, personId, 'person');
+        });
     }
 }

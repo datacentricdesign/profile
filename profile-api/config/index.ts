@@ -18,12 +18,12 @@ function validateEnv() {
     DEV_USER: str(),
     DEV_TOKEN: str(),
     // Postgres Settings
-    POSTGRES_HOST: str(),
-    POSTGRES_USER: str(),
-    POSTGRES_PASSWORD: str(),
-    POSTGRES_PORT: port(),
-    POSTGRES_DB: str(),
-    POSTGRES_LOGGING: bool(),
+    PROFILE_POSTGRES_HOST: str(),
+    PROFILE_POSTGRES_USER: str(),
+    PROFILE_POSTGRES_PASSWORD: str(),
+    PROFILE_POSTGRES_PORT: port(),
+    PROFILE_POSTGRES_DB: str(),
+    PROFILE_POSTGRES_LOGGING: bool(),
     // HTTP Settings
     HTTP_HOST: str(),
     HTTP_PORT: port(),
@@ -36,7 +36,8 @@ function validateEnv() {
     OAUTH2_CLIENT_ID: str(),
     OAUTH2_CLIENT_SECRET: str(),
     OAUTH2_SCOPE: str(),
-    FIRST_PARTY_APPS: str(),
+    OAUTH2_FIRST_PARTY_APPS: str(),
+    OAUTH2_HYDRA_ADMIN_URL: url(),
     ACP_URL: url(),
   });
 

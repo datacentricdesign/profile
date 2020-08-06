@@ -10,7 +10,7 @@ import config from "../config";
  * @return {*}
  */
 function get(flow, challenge) {
-  const url = config.oauth2.hydraURL + "/oauth2/auth/requests/" + flow + "?challenge=" + challenge
+  const url = config.oauth2.oAuth2HydraAdminURL + "/oauth2/auth/requests/" + flow + "?challenge=" + challenge
   console.log(url)
   return fetch(url,
     {
@@ -45,8 +45,7 @@ function get(flow, challenge) {
  */
 function put(flow, action, challenge, body) {
   return fetch(
-    // Joins process.env.HYDRA_URL with the request path
-    config.oauth2.hydraURL + "/oauth2/auth/requests/" + flow + "/" + action + "?challenge=" + challenge,
+    config.oauth2.oAuth2HydraAdminURL + "/oauth2/auth/requests/" + flow + "/" + action + "?challenge=" + challenge,
     {
       method: "PUT",
       body: JSON.stringify(body),

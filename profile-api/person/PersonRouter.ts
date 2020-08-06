@@ -62,7 +62,6 @@ PersonRouter.get(
      **/
 PersonRouter.post(
     "/",
-    [introspectToken(['dcd:persons']), checkPolicy('persons', 'create')],
     PersonController.createNewPerson);
 
 /**
