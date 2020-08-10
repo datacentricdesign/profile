@@ -9,8 +9,6 @@ services:
     container_name: profile-api
     environment: 
       - HOST_DATA_FOLDER=$HOST_DATA_FOLDER
-
-      - JWT_SECRET=$JWT_SECRET
       
       - NODE_ENV=$NODE_ENV
       # Only valid with NODE_ENV=development

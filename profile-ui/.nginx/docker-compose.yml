@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  test-nginx:
+    build: .
+    container_name: test-nginx
+    environment:
+     - NGINX_HOST=localhost
+     - NGINX_PORT=8081
+    ports:
+     - 8081:8081
+
+networks: 
+    default:
+        external:
+          name: dcd-net
