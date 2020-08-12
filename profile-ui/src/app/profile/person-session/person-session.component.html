@@ -27,27 +27,30 @@
                     <div class="row">
                         <div class="col-6">
                             <div *ngIf="client.requested_scope !== undefined"
-                            style="border: 1px #AAA solid; border-radius: 6px; padding: 10px;max-width:200px;margin:10px auto">
-                            <div *ngFor="let scope of client.requested_scope">
-                                <input type="checkbox" id={{scope}} value={{scope.id}} name="grant_scope"
-                                    checked="checked" disabled="true">
-                                <label for="{{scope.name}}" style="padding-left:5px">{{scope.name}}</label>
-                                <span class="description">
-                                    <i class="nc-icon nc-alert-circle-i tooltipinfo">
-                                        <span class="tooltipinfotext">{{scope.desc}}</span>
-                                    </i>
-                                </span>
+                                style="border: 1px #AAA solid; border-radius: 6px; padding: 10px;max-width:200px;margin:10px auto">
+                                <div *ngFor="let scope of client.requested_scope">
+                                    <input type="checkbox" id={{scope}} value={{scope.id}} name="grant_scope"
+                                        checked="checked" disabled="true">
+                                    <label for="{{scope.name}}" style="padding-left:5px">{{scope.name}}</label>
+                                    <span class="description">
+                                        <i class="nc-icon nc-alert-circle-i tooltipinfo">
+                                            <span class="tooltipinfotext">{{scope.desc}}</span>
+                                        </i>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
                         </div>
                         <div class="col-6">
                             <p>
-                                Here you can revoke your access consent to <b>{{client.client_name}}</b>. This will not impact your
-                                Data-Centric Design data. However, functionalities of {{client.client_name}} might not function
+                                Here you can revoke your access consent to <b>{{client.client_name}}</b>. This will not
+                                impact your
+                                Data-Centric Design data. However, functionalities of {{client.client_name}} might not
+                                function
                                 properperly where your data is needed.
                             </p>
                             <button (click)="revoke(client.client_id)" class="btn btn-danger">Revoke</button>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>

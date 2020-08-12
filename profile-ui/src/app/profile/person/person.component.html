@@ -12,17 +12,18 @@
                     <div style="max-width: 500px;">
                         <div class="form-group">
                             <label for="name">Your name</label>
-                            <input type="text" class="form-control" id="name" name="name" [(ngModel)]="updatePerson.name"
-                                #name="ngModel" placeholder="{{person.name}}">
+                            <input type="text" class="form-control" id="name" name="name"
+                                [(ngModel)]="updatePerson.name" #name="ngModel" placeholder="{{person.name}}">
                             <button (click)="editName(name.value)" class="btn btn-success"
                                 [disabled]="updatePerson.name===''">Update</button>
                         </div>
 
                         <div class="form-group">
                             <label for="name">Your Email address</label>
-                            <input type="email" class="form-control" [(ngModel)]="updatePerson.email" #email="ngModel" id="email" name="email"
-                                placeholder="{{person.email}}">
-                            <div [hidden]="email.valid || email.pristine" class="alert alert-danger">Your email is required</div>
+                            <input type="email" class="form-control" [(ngModel)]="updatePerson.email" #email="ngModel"
+                                id="email" name="email" placeholder="{{person.email}}">
+                            <div [hidden]="email.valid || email.pristine" class="alert alert-danger">Your email is
+                                required</div>
                             <button (click)="editEmail(email.value)" class="btn btn-success"
                                 [disabled]="updatePerson.email===''">Update</button>
                         </div>
@@ -46,6 +47,6 @@
             </div>
         </div>
     </div>
+</div>
 
-
-    <ng-template #noData>Loading Profile's Data</ng-template>
+<ng-template #noData>Loading Profile's Data</ng-template>
