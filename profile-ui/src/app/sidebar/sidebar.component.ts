@@ -10,9 +10,10 @@ export interface RouteInfo {
     class: string;
 }
 
-const dashboardRoute = { path: '/dashboard', title: 'Dashboard', icon: 'nc-bank', class: '' }
+const dashboardRoute = { path: 'dashboard', title: 'Dashboard', icon: 'nc-layout-11', class: '' }
+const sessionsRoute = { path: 'sessions', title: 'Current Apps', icon: 'nc-book-bookmark', class: '' }
 
-export const ROUTES: RouteInfo[] = [dashboardRoute];
+export const ROUTES: RouteInfo[] = [dashboardRoute, sessionsRoute];
 
 @Component({
     moduleId: module.id,

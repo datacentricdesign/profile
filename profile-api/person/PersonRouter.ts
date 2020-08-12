@@ -97,3 +97,15 @@ PersonRouter.delete(
     [introspectToken(['dcd:persons']), checkPolicy('persons', 'delete')],
     PersonController.deleteOnePerson
 );
+
+PersonRouter.get(
+    "/:personId/sessions",
+    [introspectToken(['dcd:persons']), checkPolicy('persons', 'read')],
+    PersonController.listAPersonSessions
+);
+
+PersonRouter.delete(
+    "/:personId/sessions/:clientId",
+    [introspectToken(['dcd:persons']), checkPolicy('persons', 'delete')],
+    PersonController.deleteAPersonSession
+);

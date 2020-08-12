@@ -12,6 +12,7 @@ const PG_UNIQUE_CONSTRAINT_VIOLATION = "23505";
 
 import * as crypto from 'crypto'
 import config from "../config";
+import fetch from "node-fetch";
 
 export class PersonService {
 

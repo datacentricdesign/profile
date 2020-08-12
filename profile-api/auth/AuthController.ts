@@ -8,11 +8,9 @@ import config from "../config";
 import { DTOPerson } from "@datacentricdesign/types";
 
 // Read scopes
-import * as fs from "fs";
 import { AuthRouter } from "./AuthRouter";
 import { PolicyService } from "./services/PolicyService";
 import { AuthService } from "./services/AuthService";
-const scopeLib = JSON.parse(fs.readFileSync("scopes.json", "utf8"));
 
 export class AuthController {
 
@@ -57,7 +55,8 @@ export class AuthController {
                             // Redirect the user back to hydra
                             .then(response => {
                                 res.json({
-                                    redirect_to: response.redirect_to}
+                                    redirect_to: response.redirect_to
+                                }
                                 );
                             })
                     );
@@ -144,7 +143,8 @@ export class AuthController {
                             // All we need to do now is to redirect the user
                             // back to hydra!
                             res.json({
-                                redirect_to: response.redirect_to}
+                                redirect_to: response.redirect_to
+                            }
                             );
                         });
                 }
@@ -233,7 +233,8 @@ export class AuthController {
                     .then(function () {
                         // The user did not want to log out. Let's redirect him back somewhere or do something else.
                         res.json({
-                            redirect_to: "https://dwd.tudelft.nl"}
+                            redirect_to: "https://dwd.tudelft.nl"
+                        }
                         );
                     })
                     // This will handle any error that happens when making HTTP calls to hydra
@@ -249,7 +250,8 @@ export class AuthController {
             .then(function (response) {
                 // All we need to do now is to redirect the user back to hydra!
                 res.json({
-                    redirect_to: response.redirect_to}
+                    redirect_to: response.redirect_to
+                }
                 );
             })
             // This will handle any error that happens when making HTTP calls to hydra
@@ -265,109 +267,115 @@ export class AuthController {
     static getConsent = async (req: Request, res: Response, next: Function) => {
         // Parses the URL query
         const query = url.parse(req.url, true).query;
-  
+
         // The challenge is used to fetch information
         // about the consent request from ORY Hydra.
         const challenge = query.consent_challenge;
-  
+
         hydra
-          .getConsentRequest(challenge)
-          // This will be called if the HTTP request was successful
-          .then(response => {
-            // If a user has granted this application the requested scope,
-            // hydra will tell us to not show the UI.
-            if (
-              response.skip ||
-              config.oauth2.firstPartyApps.includes(response.client.client_id)
-            ) {
-              // You can apply logic here, for example grant
-              // another scope, or do whatever...
-  
-              // Now it's time to grant the consent request. You could also
-              // deny the request if something went terribly wrong
-              return hydra
-                .acceptConsentRequest(challenge, {
-                  // We can grant all scopes that have been requested,
-                  // hydra already checked for us that no additional scopes
-                  // are requested accidentally.
-                  grant_scope: response.requested_scope,
-  
-                  grant_access_token_audience:
-                    response.requested_access_token_audience,
-  
-                  // The session allows us to set session data
-                  // for id and access tokens
-                  session: {
-                    // This data will be available when introspecting
-                    // the token. Try to avoid sensitive information here,
-                    // unless you limit who can introspect tokens.
-                    // access_token: { foo: 'bar' },
-  
-                    // This data will be available in the ID token.
-                    id_token: buildIDToken(
-                      response.requested_scope,
-                      response.subject
-                    )
-                  }
-                })
-                .then(response => {
-                  // All we need to do now is to redirect the
-                  // user back to hydra!
-                  res.json({
-                    redirect_to: response.redirect_to}
-                );
-                });
-            }
-            
-            // If consent can't be skipped we MUST show the consent UI.
-            return AuthController.personService.getOnePersonById(response.subject)
-                .then(person => {
-                    res.json({
-                        baseUrl: config.http.baseUrl,
-                        csrfToken: req.csrfToken(),
-                        challenge: challenge,
-                        requested_scope: buildDetailedScopes(response.requested_scope),
-                        scopes: response.requested_scope.join(","),
-                        user: person,
-                        client: response.client
-                      });
-                }) 
-        })
-          // This will handle any error that happens
-          // when making HTTP calls to hydra
-          .catch(error => next(error));
-      }
-  
-      /**
-       * Consent - Validation
-       */
+            .getConsentRequest(challenge)
+            // This will be called if the HTTP request was successful
+            .then(response => {
+                // If a user has granted this application the requested scope,
+                // hydra will tell us to not show the UI.
+                if (
+                    response.skip ||
+                    config.oauth2.firstPartyApps.includes(response.client.client_id)
+                ) {
+                    // You can apply logic here, for example grant
+                    // another scope, or do whatever...
+
+                    // If consent can't be skipped we MUST show the consent UI.
+                    return AuthController.personService.getOnePersonById(response.subject)
+                        .then(person => {
+                            // Now it's time to grant the consent request. You could also
+                            // deny the request if something went terribly wrong
+                            return hydra
+                                .acceptConsentRequest(challenge, {
+                                    // We can grant all scopes that have been requested,
+                                    // hydra already checked for us that no additional scopes
+                                    // are requested accidentally.
+                                    grant_scope: response.requested_scope,
+
+                                    grant_access_token_audience:
+                                        response.requested_access_token_audience,
+
+                                    // The session allows us to set session data
+                                    // for id and access tokens
+                                    session: {
+                                        // This data will be available when introspecting
+                                        // the token. Try to avoid sensitive information here,
+                                        // unless you limit who can introspect tokens.
+                                        // access_token: { foo: 'bar' },
+
+                                        // This data will be available in the ID token.
+                                        id_token: buildIDToken(
+                                            response.requested_scope,
+                                            person
+                                        )
+                                    }
+                                })
+                                .then(response => {
+                                    // All we need to do now is to redirect the
+                                    // user back to hydra!
+                                    res.json({
+                                        redirect_to: response.redirect_to
+                                    }
+                                    );
+                                });
+                        })
+                }
+
+                // If consent can't be skipped we MUST show the consent UI.
+                return AuthController.personService.getOnePersonById(response.subject)
+                    .then(person => {
+                        res.json({
+                            baseUrl: config.http.baseUrl,
+                            csrfToken: req.csrfToken(),
+                            challenge: challenge,
+                            requested_scope: AuthController.authService.buildDetailedScopes(response.requested_scope),
+                            scopes: response.requested_scope.join(","),
+                            user: person,
+                            client: response.client
+                        });
+                    })
+            })
+            // This will handle any error that happens
+            // when making HTTP calls to hydra
+            .catch(error => next(error));
+    }
+
+    /**
+     * Consent - Validation
+     */
     static postConsent = async (req: Request, res: Response, next: Function) => {
         // The challenge is now a hidden input field, so let's take it
         // from the request body instead
         const challenge = req.body.challenge;
-  
+
         // Let's see if the user decided to accept or reject the consent request..
         if (req.body.submit === "Deny access") {
-          // Looks like the consent request was denied by the user
-          return (
-            hydra
-              .rejectConsentRequest(challenge, {
-                error: "access_denied",
-                error_description: "The resource owner denied the request"
-              })
-              .then(response => {
-                // All we need to do now is to redirect
-                // the browser back to hydra!
-                res.json({
-                    redirect_to: response.redirect_to}
-                );
-              })
-              // This will handle any error that happens
-              // when making HTTP calls to hydra
-              .catch(error => next(error))
-          );
+            // Looks like the consent request was denied by the user
+            return (
+                hydra
+                    .rejectConsentRequest(challenge, {
+                        error: "access_denied",
+                        error_description: "The resource owner denied the request"
+                    })
+                    .then(response => {
+                        // All we need to do now is to redirect
+                        // the browser back to hydra!
+                        res.json({
+                            redirect_to: response.redirect_to
+                        }
+                        );
+                    })
+                    // This will handle any error that happens
+                    // when making HTTP calls to hydra
+                    .catch(error => next(error))
+            );
         }
-  
+
         let grant_scope = req.body.scopes.split(",");
         // if (!Array.isArray(grant_scope)) {
         //   grant_scope = [grant_scope];
@@ -378,68 +386,70 @@ export class AuthController {
             // hydra already checked for us that no additional scopes
             // are requested accidentally.
             grant_scope: grant_scope,
-  
+
             // The session allows us to set session data for id and access tokens
             session: {
-              // This data will be available when introspecting the token.
-              // Try to avoid sensitive information here,
-              // unless you limit who can introspect tokens.
-              // access_token: { foo: 'bar' },
-  
-              // This data will be available in the ID token.
-              id_token: buildIDToken(grant_scope, req.body.user)
+                // This data will be available when introspecting the token.
+                // Try to avoid sensitive information here,
+                // unless you limit who can introspect tokens.
+                // access_token: { foo: 'bar' },
+
+                // This data will be available in the ID token.
+                id_token: buildIDToken(grant_scope, req.body.user)
             },
-  
+
             // This tells hydra to remember this consent request and allow the
             // same client to request the same
             // scopes from the same user, without showing the UI, in the future.
             remember: Boolean(req.body.remember),
-  
+
             // When this "remember" session expires, in seconds. Set this to 0
             // so it will never expire.
             remember_for: 3600
-          })
-          .then(response => {
-            // All we need to do now is to redirect the user back to hydra!
-            res.json({
-                redirect_to: response.redirect_to}
-            );
-          })
-          // This will handle any error that happens
-          // when making HTTP calls to hydra
-          .catch(error => next(error));
-      }
+        })
+            .then(response => {
+                // All we need to do now is to redirect the user back to hydra!
+                res.json({
+                    redirect_to: response.redirect_to
+                }
+                );
+            })
+            // This will handle any error that happens
+            // when making HTTP calls to hydra
+            .catch(error => next(error));
+    }
 
 }
 
 function login(req, res, next) {
     // Seems like the user authenticated! Let's tell hydra...
     hydra.acceptLoginRequest(req.body.challenge, {
-            // Subject is an alias for user ID. A subject can be a random string,
-            // a UUID, an email address, ....
-            subject: req.context.userId,
+        // Subject is an alias for user ID. A subject can be a random string,
+        // a UUID, an email address, ....
+        subject: req.context.userId,
 
-            // This tells hydra to remember the browser and automatically
-            // set the "skip" parameter in the other
-            // route to true on subsequent requests!
-            remember: Boolean(req.body.remember),
+        // This tells hydra to remember the browser and automatically
+        // set the "skip" parameter in the other
+        // route to true on subsequent requests!
+        remember: Boolean(req.body.remember),
 
-            // When the session expires, in seconds. Set this to 0
-            // so it will never expire.
-            remember_for: 3600
+        // When the session expires, in seconds. Set this to 0
+        // so it will never expire.
+        remember_for: 3600
 
-            // Sets which "level" (e.g. 2-factor authentication) of
-            // authentication the user has. The value is really arbitrary
-            // and optional. In the context of OpenID Connect, a value
-            // of 0 indicates the lowest authorization level.
-            // acr: '0',
-        })
+        // Sets which "level" (e.g. 2-factor authentication) of
+        // authentication the user has. The value is really arbitrary
+        // and optional. In the context of OpenID Connect, a value
+        // of 0 indicates the lowest authorization level.
+        // acr: '0',
+    })
         .then(response => {
             // req.session.subject = req.subject;
             // All we need to do now is to redirect the
             // user back to hydra!
             res.json({
-                redirect_to: response.redirect_to}
+                redirect_to: response.redirect_to
+            }
             );
         })
         // This will handle any error that happens when making
@@ -466,48 +476,33 @@ function login(req, res, next) {
 
 
 function buildIDToken(grant_scope, user) {
-    const idToken:any = {};
+    const idToken: any = {};
     // This is the openid 'profile' scope which should include
     // some user profile data. (optional)
     if (grant_scope.indexOf("profile") > 0) {
-      idToken.id = user.id;
-      idToken.sub = user.id;
-      idToken.name = user.name;
-      idToken.teams = "1";
-      idToken.given_name = user.name;
-      idToken.family_name = "";
-      idToken.profile = "";
-      idToken.grafana_role = "Editor";
+        idToken.id = user.id;
+        idToken.sub = user.id;
+        idToken.name = user.name;
+        idToken.teams = "1";
+        idToken.given_namame = "";
+        idToken.profilee = user.name;
+        idToken.family_n = "";
+        idToken.grafana_role = "Editor";
     }
-  
+
     // This is to fulfill the openid 'email' scope which returns
     // the user's email address. (optional)
     if (grant_scope.indexOf("email") > 0) {
-      idToken.email = user.email;
-      idToken.email_verified = false;
+        idToken.email = user.email;
+        idToken.email_verified = false;
     }
-  
-    if (grant_scope.indexOf("phone") > 0) {
-      idToken.phone_number = "";
-      idToken.phone_verified = false;
-    }
-    return idToken;
-  }
 
-  function buildDetailedScopes(scopes) {
-    const detailedScopes = [];
-    for (let key in scopes) {
-      if (scopeLib[scopes[key]]) {
-        detailedScopes.push(scopeLib[scopes[key]]);
-      } else {
-        detailedScopes.push({
-          id: scopes[key],
-          name: scopes[key],
-          desc: ""
-        });
-      }
+    if (grant_scope.indexOf("phone") > 0) {
+        idToken.phone_number = "";
+        idToken.phone_verified = false;
     }
-    return detailedScopes;
-  }
+    console.log(idToken)
+    return idToken;
+}
 
 export default AuthController;

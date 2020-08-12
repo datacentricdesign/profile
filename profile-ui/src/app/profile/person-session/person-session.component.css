@@ -11,7 +11,6 @@
     width: 200px;
     background-color: #555;
     color: #fff;
-    text-align: center;
     padding: 5px 0;
     border-radius: 6px;
 
@@ -21,10 +20,12 @@
     bottom: 125%;
     left: 50%;
     margin-left: -100px;
+    padding:5px;
 
     /* Fade in tooltip */
     opacity: 0;
     transition: opacity 0.3s;
+    font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Tooltip arrow */

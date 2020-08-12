@@ -9,9 +9,7 @@ import { NavbarModule} from './shared/navbar/navbar.module'
 import { FixedPluginModule} from './shared/fixedplugin/fixedplugin.module'
 
 import { AppComponent } from './app.component'
-import { AppRoutes } from './app.routing'
-
-import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component'
+import { AppRoutes } from './app.routes'
 
 import { HttpClientModule } from '@angular/common/http'
 import { OAuthModule } from 'angular-oauth2-oidc';
@@ -24,7 +22,11 @@ import { SignUpPageComponent } from './pages/sign-up-page/sign-up-page.component
 import { SignOutPageComponent } from './pages/sign-out-page/sign-out-page.component';
 import { ConsentPageComponent } from './pages/consent-page/consent-page.component';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
-import { AppService } from './app.service'
+import { AppService } from './app.service';
+import { ProfileComponent } from './profile/profile.component'
+import { BrowserModule } from '@angular/platform-browser'
+import { SharedModule } from './shared/shared.module';
+import { PersonSessionComponent } from './profile/person-session/person-session.component'
 
 export function init_app(appService: AppService) {
   return () => appService.load();
@@ -33,26 +35,37 @@ export function init_app(appService: AppService) {
 @NgModule({
   declarations: [
     AppComponent,
-    AdminLayoutComponent,
     LandingPageComponent,
     SignInPageComponent,
     SignUpPageComponent,
     SignOutPageComponent,
     ConsentPageComponent,
     ErrorPageComponent,
+    ProfileComponent,
+    PersonSessionComponent
   ],
   imports: [
+    BrowserModule,
     BrowserAnimationsModule,
-    RouterModule.forRoot(AppRoutes),
+    RouterModule.forRoot(AppRoutes, {
+      useHash: false,
+      initialNavigation: true
+    }),
     SidebarModule,
     NavbarModule,
     ToastrModule.forRoot(),
-    OAuthModule.forRoot(),
+    OAuthModule.forRoot({
+      resourceServer: {
+        allowedUrls: ['https://dwd.tudelft.nl'],
+        sendAccessToken: true
+      }
+    }),
     FooterModule,
     FixedPluginModule,
     HttpClientModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    SharedModule.forRoot(),
   ],
   providers: [{ 
     provide: APP_INITIALIZER, 
@@ -64,3 +77,6 @@ export function init_app(appService: AppService) {
   entryComponents: []
 })
 export class AppModule { }
+
+
+

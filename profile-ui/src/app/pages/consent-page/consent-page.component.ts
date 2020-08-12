@@ -43,7 +43,10 @@ export class ConsentPageComponent implements OnInit {
       this.consent_challenge = params["consent_challenge"]
       this.auth$ = this.http.get<any>(this.apiURL + "/auth/consent?consent_challenge=" + this.consent_challenge).pipe(
         map((data: any) => {
-          console.log(data)
+          if (data.redirect_to !== undefined) {
+            window.location.href = data.redirect_to
+            return false
+          }
           this.csrf = data.csrfToken
           this.client = data.client
           this.user = data.user

@@ -4,6 +4,7 @@ import {validate} from "class-validator";
 import {Person} from "./Person";
 import { DTOPerson } from "@datacentricdesign/types";
 import {PersonService} from "./PersonService"
+import AuthController from "../auth/AuthController";
 
 export class PersonController {
 
@@ -22,6 +23,30 @@ export class PersonController {
             res.send(person);
         } catch (error) {
             res.status(404).send("Person not found");
+        }
+    };
+
+    static listAPersonSessions = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const personId: string = req.params.personId;
+        try {
+            const sessions: any = await AuthController.authService.listAPersonSessions(personId)
+            res.send(sessions);
+        } catch (error) {
+            res.status(404).send("Person's sessions not found");
+        }
+    };
+
+    static deleteAPersonSession = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const personId: string = req.params.personId;
+        const clientId: string = req.params.clientId;
+        try {
+            await AuthController.authService.deleteAPersonSession(personId, clientId)
+            res.status(204).send();
+        } catch (error) {
+            console.log(error)
+            res.status(404).send("Person's sessions not found");
         }
     };
 
@@ -96,6 +121,8 @@ export class PersonController {
             next(error)
         }
     };
+
+    
 };
 
 export default PersonController;

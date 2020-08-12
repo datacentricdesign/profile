@@ -1,11 +1,12 @@
 import fetch from 'node-fetch'
-import {RequestInit} from 'node-fetch'
+import { RequestInit } from 'node-fetch'
 import * as qs from 'querystring'
 import * as SimpleOauth from 'simple-oauth2'
 import { DCDError } from '@datacentricdesign/types'
 import { PolicyService } from './PolicyService'
 import config from '../../config'
 import { URL } from 'url'
+import * as fs from "fs";
 
 export interface Token {
     aud: string,
@@ -16,6 +17,8 @@ export interface Token {
  * This class handle Authentication and Authorisation processes
  */
 export class AuthService {
+
+    scopeLib = JSON.parse(fs.readFileSync("scopes.json", "utf8"));
 
     oauth2: SimpleOauth.ClientCredentials
     token = null
@@ -122,7 +125,7 @@ export class AuthService {
      * @returns {Promise}
      */
     async authorisedRequest(method: string, url: string, body: object = null, type: string = 'application/json'): Promise<any> {
-        const options:RequestInit = {
+        const options: RequestInit = {
             headers: {
                 Authorization: this.getBearer(),
                 'Content-Type': type,
@@ -154,5 +157,65 @@ export class AuthService {
         catch (error) {
             return Promise.reject(error)
         }
+    }
+
+
+    /**
+     * List a Person's sessions.
+     * @param {string} personId
+     * returns {Person}
+     **/
+    async listAPersonSessions(personId: string) {
+        console.log('list a person\'s sessions')
+        const url = config.oauth2.oAuth2HydraAdminURL + "/oauth2/auth/sessions/consent?subject=" + personId
+        console.log(url)
+        const res = await fetch(url, { headers: { "X-Forwarded-Proto": "https" } })
+        if (res.status < 200 || res.status > 302) {
+            // This will handle any errors that aren't network related
+            // (network related errors are handled automatically)
+            const error = await res.json()
+            console.error("An error occurred while making a HTTP request: ", error)
+            return Promise.reject(new Error(error.error.message))
+        }
+        const result = await res.json()
+        for (let i = 0; i < result.length; i++) {
+            result[i].consent_request.requested_scope = this.buildDetailedScopes(result[i].consent_request.requested_scope)
+        }
+        return Promise.resolve(result)
+    }
+
+    /**
+     * Delete a Person's session.
+     * @param {string} personId
+     * returns {Person}
+     **/
+    async deleteAPersonSession(personId: string, clientId: string) {
+        console.log('Delete a person\'s session')
+        const url = config.oauth2.oAuth2HydraAdminURL + "/oauth2/auth/sessions/consent?subject=" + personId + '&client=' + clientId
+        console.log(url)
+        const res = await fetch(url, { headers: { "X-Forwarded-Proto": "https" }, method: 'DELETE'})
+        if (res.status < 200 || res.status > 302) {
+            // This will handle any errors that aren't network related
+            // (network related errors are handled automatically)
+            const error = await res.json()
+            console.error("An error occurred while making a HTTP request: ", error)
+            return new Error(error.error.message)
+        }
+    }
+
+    buildDetailedScopes(scopes) {
+        const detailedScopes = [];
+        for (let key in scopes) {
+            if (this.scopeLib[scopes[key]]) {
+                detailedScopes.push(this.scopeLib[scopes[key]]);
+            } else {
+                detailedScopes.push({
+                    id: scopes[key],
+                    name: scopes[key],
+                    desc: ""
+                });
+            }
+        }
+        return detailedScopes;
     }
 }

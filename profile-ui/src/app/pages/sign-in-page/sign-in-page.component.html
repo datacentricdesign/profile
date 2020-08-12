@@ -4,17 +4,20 @@
             <form (ngSubmit)="postSignIn()" #signInForm="ngForm" *ngIf="auth$ | async as data else noData">
                 <div class="card card-stats" style="max-width: 500px;margin:auto">
                     <div class="card-header" style="text-align:center;">
-                        <span *ngIf="data.client.logo_uri !== ''">
+                        <span *ngIf="data.client.client_id!='clients:profile-ui' && data.client.logo_uri !== ''">
                             <img src="{{data.client.logo_uri}}" style="max-width: 150px;" />
                             <i class="nc-icon nc-simple-add"></i>
                         </span>
                         <img src="./assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
-                        <p *ngIf="client !== undefined">
+                        <p *ngIf="client !== undefined && client.client_id!='clients:profile-ui'">
                             Sign in to <b>{{client.client_name || client.client_id}}</b> with your <br>Data-Centric Design Lab Account.
                         </p>
-                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{client.policy_uri}}">Policy</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}">Terms of Service</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{client.contacts[0]}}">Contact</a>
+                        <p *ngIf="client !== undefined && client.client_id=='clients:profile-ui'">
+                            Sign in to your <br>Data-Centric Design Lab Account.
+                        </p>
+                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{client.policy_uri}}" target="_blank">Policy</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}" target="_blank">Terms of Service</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{client.contacts[0]}}" target="_blank">Contact</a>
                     </div>
                     <div class="card-body">
                         <div class="row">

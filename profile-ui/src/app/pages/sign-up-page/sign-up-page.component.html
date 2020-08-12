@@ -4,22 +4,25 @@
             <form (ngSubmit)="postSignUp()" #signUpForm="ngForm" *ngIf="auth$ | async as data else noData">
                 <div class="card card-stats" style="max-width: 500px;margin:auto">
                     <div class="card-header" style="text-align:center;">
-                        <span *ngIf="client.logo_uri !== ''">
+                        <span *ngIf="data.client.client_id!='clients:profile-ui' && client.logo_uri !== ''">
                             <img src="{{client.logo_uri}}" style="max-width: 150px;" />
                             <i class="nc-icon nc-simple-add"></i>
                         </span>
                         <img src="./assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
-                        <p *ngIf="client !== undefined">
+                        <p *ngIf="client !== undefined && client.client_id!='clients:profile-ui'">
                             Sign up for a Data-Centric Design Lab Account<br>
                             and log in on <b>{{client.client_name || client.client_id}}</b>
                         </p>
+                        <p *ngIf="client !== undefined && client.client_id=='clients:profile-ui'">
+                            Sign up for a Data-Centric Design Lab Account<br>
+                        </p>
 
                         <a *ngIf="client!==undefined && client.policy_uri!==''"
-                            href="{{data.client.policy_uri}}">Policy</a>&nbsp;/&nbsp;
+                            href="{{data.client.policy_uri}}" target="_blank">Policy</a>&nbsp;/&nbsp;
                         <a *ngIf="client!==undefined && client.tos_uri!==''"
-                            href="{{client.tos_uri}}">Terms of Service</a>&nbsp;/&nbsp;
+                            href="{{client.tos_uri}}" target="_blank">Terms of Service</a>&nbsp;/&nbsp;
                         <a *ngIf="client!==undefined && client.contacts!==''"
-                            href="mailto:{{data.client.contacts[0]}}">Contact</a>
+                            href="mailto:{{data.client.contacts[0]}}" target="_blank">Contact</a>
                     </div>
                     <div class="card-body">
                         <div class="row">
