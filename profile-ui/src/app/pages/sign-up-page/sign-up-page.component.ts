@@ -65,9 +65,10 @@ export class SignUpPageComponent implements OnInit {
       if (data.error) {
         this.error = data.error
         console.log(this.error)
+      } else if (data.redirect_to) {
+        window.location = data.redirect_to
       }
     });
   }
-
 
 }
