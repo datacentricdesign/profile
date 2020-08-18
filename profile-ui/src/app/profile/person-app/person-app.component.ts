@@ -14,11 +14,11 @@ declare interface TableData {
 }
 
 @Component({
-  selector: 'app-person-session',
-  templateUrl: './person-session.component.html',
-  styleUrls: ['./person-session.component.css']
+  selector: 'app-person-app',
+  templateUrl: './person-app.component.html',
+  styleUrls: ['./person-app.component.css']
 })
-export class PersonSessionComponent implements OnInit {
+export class PersonAppComponent implements OnInit {
 
 
   private apiURL: string
@@ -26,8 +26,8 @@ export class PersonSessionComponent implements OnInit {
   public tableData1: TableData;
   public tableData2: TableData;
 
-  sessions$: Observable<any>
-  sessions: any
+  apps$: Observable<any>
+  apps: any
 
   personId: string
   clients: any = []
@@ -46,19 +46,19 @@ export class PersonSessionComponent implements OnInit {
         this.personId = claim.sub
         let headers = new HttpHeaders().set('Accept', 'application/json')
           .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
-        const url = this.apiURL + "/persons/" + claim.sub + '/sessions'
+        const url = this.apiURL + "/persons/" + claim.sub + '/apps'
         console.log(url)
-        this.sessions$ = this.http.get<any>(url, { headers }).pipe(
+        this.apps$ = this.http.get<any>(url, { headers }).pipe(
           map((data: any) => {
             console.log(data)
-            this.sessions = data
+            this.apps = data
             const clients:object = {}
-            for (let i=0;i<this.sessions.length;i++) {
-              console.log(this.sessions[i])
-              const clientId = this.sessions[i].consent_request.client.client_id
+            for (let i=0;i<this.apps.length;i++) {
+              console.log(this.apps[i])
+              const clientId = this.apps[i].consent_request.client.client_id
               if (clients[clientId]===undefined) {
-                clients[clientId] = this.sessions[i].consent_request.client
-                clients[clientId].requested_scope = this.sessions[i].consent_request.requested_scope
+                clients[clientId] = this.apps[i].consent_request.client
+                clients[clientId].requested_scope = this.apps[i].consent_request.requested_scope
               }
             }
             for (let i in clients) {
@@ -66,7 +66,7 @@ export class PersonSessionComponent implements OnInit {
             }
             return data;
           }), catchError(error => {
-            return throwError('Person\'s sessions not found!');
+            return throwError('Person\'s apps not found!');
           })
         )
       }

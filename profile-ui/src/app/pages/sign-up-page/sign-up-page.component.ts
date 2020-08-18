@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { AppService } from 'app/app.service';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 
 @Component({
@@ -23,19 +24,21 @@ export class SignUpPageComponent implements OnInit {
   client:any
   error:any
   apiURL: string
-
   constructor(private route: ActivatedRoute,
-    private _router: Router,
     private http: HttpClient,
     private appService: AppService) {
       this.apiURL = this.appService.settings.apiURL;
   }
 
-  model: DTOPerson = {
+  model: any = {
     email: '',
     password: '',
-    name: ""
+    name: '',
+    id: '',
+    confirmPassword: ''
   }
+
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       console.log(params)

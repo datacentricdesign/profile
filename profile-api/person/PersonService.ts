@@ -37,13 +37,20 @@ export class PersonService {
             return Promise.reject(new DCDError(4003, 'Add field name.'))
         }
         if (dtoPerson.email === undefined || dtoPerson.email === '') {
-            return Promise.reject(new DCDError(4003, 'Add field type.'))
+            return Promise.reject(new DCDError(4003, 'Add field email.'))
         }
-        const personId = "dcd:persons:" + uuidv4()
+        if (dtoPerson.id === undefined || !dtoPerson.id.startsWith('dcd:persons')) {
+            return Promise.reject(new DCDError(4003, 'An id should be provided with the prefix dcd:persons'))
+        }
+        const exists = await this.checkIfPersonIdExists(dtoPerson.id)
+        if (exists) {
+            return Promise.reject(new DCDError(4003, 'This id (username) is already in use'))
+        }
+        
         const person: Person = new Person()
-        person.id = personId,
-        person.email = dtoPerson.email,
-        person.name = dtoPerson.name,
+        person.id = dtoPerson.id
+        person.email = dtoPerson.email
+        person.name = dtoPerson.name
         PersonService.validPassword(dtoPerson.password)
         person.password = PersonService.encryptPassword(dtoPerson.password)
 
@@ -51,8 +58,10 @@ export class PersonService {
         try {
             const personRepository = getRepository(Person);
             await personRepository.save(person);
-            await PersonService.policyService.grant(personId, personId, 'person');
-            return this.getOnePersonById(personId);
+            await PersonService.policyService.grant(person.id, person.id, 'person');
+            await PersonService.policyService.addMembersToRole("dcd:groups:public", [person.id]);
+            await PersonService.policyService.addMembersToRole("dcd:groups:user", [person.id]);
+            return this.getOnePersonById(person.id);
         } catch(error) {
             if (error.code === PG_UNIQUE_CONSTRAINT_VIOLATION) {
                 throw new DCDError(4002, '')
@@ -78,9 +87,10 @@ export class PersonService {
     }
 
     /**
-     * Read a Person.
-     * @param {string} personId
-     * returns {string} The person id if valid, else undefined
+     * Check if the combination email/password exists.
+     * @param {string} personEmail
+     * @param {string} personPassword
+     * returns {string} The person id if the combination exists, else undefined
      **/
     async checkPersonByEmailPassword(personEmail: string, personPassword: string) {
         const personRepository = getRepository(Person);
@@ -90,6 +100,37 @@ export class PersonService {
                                 .setParameters({ personEmail, personPassword: PersonService.encryptPassword(personPassword) })
                                 .getOne()
         return person !== undefined ? person.id : undefined
+    }
+
+    /**
+     * Check if the combination id/password exists.
+     * @param {string} personId
+     * @param {string} personPassword
+     * returns {string} The person id if the combination exists, else undefined
+     **/
+    async checkPersonByIdPassword(personId: string, personPassword: string) {
+        const personRepository = getRepository(Person);
+        let person = await personRepository
+                                .createQueryBuilder("person")
+                                .where("person.id = :personId AND person.password = :personPassword")
+                                .setParameters({ personId, personPassword: PersonService.encryptPassword(personPassword) })
+                                .getOne()
+        return person !== undefined ? person.id : undefined
+    }
+
+    /**
+     * Check if a person id is already in use a Person.
+     * @param {string} personId
+     * returns {string} True if the id is already in use, else false
+     **/
+    async checkIfPersonIdExists(personId: string) {
+        const personRepository = getRepository(Person);
+        let person = await personRepository
+                                .createQueryBuilder("person")
+                                .where("person.id = :personId")
+                                .setParameters({ personId })
+                                .getOne()
+        return person !== undefined
     }
 
     /**

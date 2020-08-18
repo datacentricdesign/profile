@@ -161,12 +161,12 @@ export class AuthService {
 
 
     /**
-     * List a Person's sessions.
+     * List a Person's apps.
      * @param {string} personId
      * returns {Person}
      **/
-    async listAPersonSessions(personId: string) {
-        console.log('list a person\'s sessions')
+    async listAPersonApps(personId: string) {
+        console.log('list a person\'s apps')
         const url = config.oauth2.oAuth2HydraAdminURL + "/oauth2/auth/sessions/consent?subject=" + personId
         console.log(url)
         const res = await fetch(url, { headers: { "X-Forwarded-Proto": "https" } })
@@ -185,12 +185,12 @@ export class AuthService {
     }
 
     /**
-     * Delete a Person's session.
+     * Delete a Person's app.
      * @param {string} personId
      * returns {Person}
      **/
-    async deleteAPersonSession(personId: string, clientId: string) {
-        console.log('Delete a person\'s session')
+    async deleteAPersonApp(personId: string, clientId: string) {
+        console.log('Delete a person\'s app')
         const url = config.oauth2.oAuth2HydraAdminURL + "/oauth2/auth/sessions/consent?subject=" + personId + '&client=' + clientId
         console.log(url)
         const res = await fetch(url, { headers: { "X-Forwarded-Proto": "https" }, method: 'DELETE'})

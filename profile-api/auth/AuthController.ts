@@ -171,6 +171,7 @@ export class AuthController {
     static postSignUp = async (req: Request, res: Response, next: Function) => {
         const url = config.http.url + "/persons";
         const person: DTOPerson = {
+            id: req.body.id,
             email: req.body.email,
             name: req.body.name,
             password: req.body.password

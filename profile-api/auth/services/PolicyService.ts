@@ -58,7 +58,7 @@ export class PolicyService {
    **/
   async revoke(subjectId: string, resourceId: string, roleName: string): Promise<any> {
     try {
-      const policyId:string = await this.getRoleId(subjectId, resourceId, roleName);
+      const policyId: string = await this.getRoleId(subjectId, resourceId, roleName);
       // There is an existing policy, let's update
       return this.createPolicy(subjectId, resourceId, roleName, 'deny', policyId);
     }
@@ -82,13 +82,93 @@ export class PolicyService {
         }
       })
       return role.id;
-    } catch(error) {
+    } catch (error) {
       throw new DCDError(4041, 'Role not found for ' + subjectId +
-      ', ' + resourceId +
-      ' and ' + roleName)
+        ', ' + resourceId +
+        ' and ' + roleName)
     }
   }
 
+  async listRolesOfAMember(member: string) {
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles'
+    try {
+      const res = await fetch(url, { headers: this.ketoHeaders, method: 'GET'});
+      return res.json();
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async createARole(creator: string, roleId: string, members: string[]) {
+    console.log('creating a role...')
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles'
+    const body = JSON.stringify({id: roleId, members: members})
+    try {
+      // create the group as new role with members on Keto
+      const res = await fetch(url, { headers: this.ketoHeaders, method: 'PUT', body: body});
+      // Create a policy giving management rights to the group creator
+      const policy = {
+        id: roleId,
+        effect: "allow",
+        actions: roleToActions("groupAdmin"),
+        subjects: [creator],
+        resources: [roleId]
+      }
+      return this.updateKetoPolicy(policy)
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async deleteARole(roleId: string) {
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles/' + roleId
+    try {
+      // Delete the role on Keto (and its list of members)
+      const res = await fetch(url, { headers: this.ketoHeaders, method: 'DELETE'});
+      // Delete the policy giving management rights to the group creator
+      return this.deleteKetoPolicy(roleId)
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async addMembersToRole(roleId: string, members: string[]) {
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles/' + roleId + '/members'
+    const body = JSON.stringify({members: members})
+    try {
+      return fetch(url, { headers: this.ketoHeaders, method: 'PUT', body});
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async removeAMemberFromRole(roleId: string, memberId: string) {
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles/' + roleId + '/members/' + memberId
+    try {
+      return fetch(url, { headers: this.ketoHeaders, method: 'DELETE'});
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async readRole(roleId: string) {
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles/' + roleId
+    try {
+      const res = await fetch(url, { headers: this.ketoHeaders, method: 'GET'});
+      if (res.status === 404) {
+        return Promise.reject(new DCDError(404, 'Role not found'))
+      }
+      Promise.resolve(res.json());
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
 
   async createPolicy(subjectId: string, resourceId: string, roleName: string, effect = 'allow', id?: string) {
     const policyId = id !== undefined ? id : uuidv4()
@@ -102,7 +182,7 @@ export class PolicyService {
 
     try {
       await roleRepository.save(newRole);
-    } catch(error) {
+    } catch (error) {
       return Promise.reject(error)
     }
 
@@ -113,19 +193,18 @@ export class PolicyService {
       subjects: [subjectId],
       resources: [resourceId]
     }
-    console.log(policy)
     return this.updateKetoPolicy(policy)
   }
 
-  async deletePolicy(subjectId:string, resourceId:string, roleName:string) {
+  async deletePolicy(subjectId: string, resourceId: string, roleName: string) {
     try {
-      const roleId:string = await this.getRoleId(subjectId, resourceId, roleName)
+      const roleId: string = await this.getRoleId(subjectId, resourceId, roleName)
       // There is an existing policy, let's update
       const roleRepository = getRepository(Role);
       await roleRepository.delete(roleId);
       // Use the role id to retrieve and delete associated Keto's policy
       return this.deleteKetoPolicy(roleId)
-    } catch(error) {
+    } catch (error) {
       return Promise.reject(error); // Otherwise, something went wrong
     }
   }
@@ -137,18 +216,10 @@ export class PolicyService {
       method: 'POST',
       body: JSON.stringify(acp)
     }
-    console.log('checking policies...')
-    console.log(acp)
-    console.log(url)
     try {
       const res = await fetch(url, options);
       if (res.ok) {
-      
         return Promise.resolve();
-        // const json:any = res.json();
-        // if (!json.allowed) {
-        //   return Promise.reject(new DCDError(403, 'Request was not allowed'));
-        // }
       }
       return Promise.reject(new DCDError(4031, 'Request was not allowed'));
     }
@@ -209,6 +280,8 @@ const roleToActions = (role: string) => {
     case 'subject':
       return ['dcd:actions:create', 'dcd:actions:read', 'dcd:actions:update']
     case 'person':
+      return ['dcd:actions:read', 'dcd:actions:update', 'dcd:actions:delete']
+    case 'groupAdmin':
       return ['dcd:actions:read', 'dcd:actions:update', 'dcd:actions:delete']
     default:
       return []

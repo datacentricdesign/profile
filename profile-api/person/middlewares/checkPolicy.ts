@@ -34,6 +34,9 @@ function buildACPResource(resource: string, req: Request): string {
     if (req.params.personId !== undefined) {
         acpResource = req.params.personId
     }
+    if (req.params.groupId !== undefined) {
+        acpResource = req.params.groupId
+    }
     return acpResource
 }
 

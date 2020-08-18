@@ -51,7 +51,6 @@ export class SignInPageComponent implements OnInit {
         })
       )
     });
-
   }
 
   postSignIn(): void {

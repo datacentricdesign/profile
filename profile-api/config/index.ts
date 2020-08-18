@@ -13,8 +13,9 @@ function validateEnv() {
     HOST_DATA_FOLDER: str(),
     // Environment
     NODE_ENV: str(),
-    DEV_USER: str(),
-    DEV_TOKEN: str(),
+    
+    PROFILE_ADMIN_PASSWORD: str(),
+
     CRYPTO_ALGO: str(),
     CRYPTO_KEY: str(),
     // Postgres Settings

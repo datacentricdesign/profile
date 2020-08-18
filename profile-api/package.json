@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/datacentricdesign/profile#readme",
   "dependencies": {
-    "@datacentricdesign/types": "0.0.3",
+    "@datacentricdesign/types": "0.0.5",
     "apidoc": "0.24.0",
     "body-parser": "1.19.0",
     "class-validator": "0.12.2",
