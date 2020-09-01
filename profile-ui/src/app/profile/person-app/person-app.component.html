@@ -1,4 +1,4 @@
-<div *ngIf="sessions$ | async as sessions else noData">
+<div *ngIf="apps$ | async as apps else noData">
     <h1>
         Current apps
     </h1>
@@ -58,4 +58,4 @@
 </div>
 
 
-<ng-template #noData>Loading sessions...</ng-template>
+<ng-template #noData>Loading apps...</ng-template>
