@@ -22,7 +22,7 @@ export class GroupController {
     static createAGroup = async (req: Request, res: Response, next: NextFunction) => {
         const group = req.body
         if (group.id === undefined || !group.id.startsWith('dcd:groups')) {
-            return next(new DCDError(4003, 'An group id should be provided with the prefix dcd:groups'))
+            return next(new DCDError(400, 'An group id should be provided with the prefix dcd:groups'))
         }
         try {
             const result: any = await GroupController.policyService.readRole(group.id)

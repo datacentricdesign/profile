@@ -46,8 +46,8 @@
                         <hr>
 
                         <div *ngIf="error !== undefined" class="alert alert-danger" role="alert">
-                            <p *ngIf="error.requirements !== undefined" class="danger">{{error.requirements}}</p>
-                            <p *ngIf="error.hint !== undefined" class="danger">{{error.hint}}</p>
+                            <p *ngIf="error._requirements !== undefined" class="danger">{{error._requirements}}</p>
+                            <p *ngIf="error._hint !== undefined" class="danger">{{error._hint}}</p>
                             <p *ngIf="error.message !== undefined" class="danger">{{error.message}}</p>
                         </div>
 

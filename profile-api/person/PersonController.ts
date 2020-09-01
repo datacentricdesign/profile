@@ -15,6 +15,7 @@ export class PersonController {
     };
 
     static getOnePersonById = async (req: Request, res: Response) => {
+        console.log('get one person')
         // Get the ID from the url
         const personId: string = req.params.personId;
         try {
@@ -22,6 +23,7 @@ export class PersonController {
             const person: Person = await PersonController.personService.getOnePersonById(personId)
             res.send(person);
         } catch (error) {
+            console.log(error)
             res.status(404).send("Person not found");
         }
     };

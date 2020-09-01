@@ -34,17 +34,21 @@ export class PersonService {
     async createNewPerson(dtoPerson: DTOPerson): Promise<Person> {
         // Check Thing input
         if (dtoPerson.name === undefined || dtoPerson.name === '') {
-            return Promise.reject(new DCDError(4003, 'Add field name.'))
+            return Promise.reject(new DCDError(400, 'Add field name.'))
         }
         if (dtoPerson.email === undefined || dtoPerson.email === '') {
-            return Promise.reject(new DCDError(4003, 'Add field email.'))
+            return Promise.reject(new DCDError(400, 'Add field email.'))
         }
         if (dtoPerson.id === undefined || !dtoPerson.id.startsWith('dcd:persons')) {
-            return Promise.reject(new DCDError(4003, 'An id should be provided with the prefix dcd:persons'))
+            return Promise.reject(new DCDError(400, 'An id should be provided with the prefix dcd:persons'))
         }
         const exists = await this.checkIfPersonIdExists(dtoPerson.id)
         if (exists) {
-            return Promise.reject(new DCDError(4003, 'This id (username) is already in use'))
+            return Promise.reject(new DCDError(400, 'This id (username) is already in use.'))
+        }
+        const emailExists = await this.checkIfEmailExists(dtoPerson.email)
+        if (emailExists) {
+            return Promise.reject(new DCDError(400, 'This email address is already in use.'))
         }
         
         const person: Person = new Person()
@@ -126,7 +130,7 @@ export class PersonService {
     }
 
     /**
-     * Check if a person id is already in use a Person.
+     * Check if a person id is already in use.
      * @param {string} personId
      * returns {string} True if the id is already in use, else false
      **/
@@ -136,6 +140,21 @@ export class PersonService {
                                 .createQueryBuilder("person")
                                 .where("person.id = :personId")
                                 .setParameters({ personId })
+                                .getOne()
+        return person !== undefined
+    }
+
+    /**
+     * Check if a email address is already in use.
+     * @param {string} email
+     * returns {string} True if the id is already in use, else false
+     **/
+    async checkIfEmailExists(email: string) {
+        const personRepository = getRepository(Person);
+        let person = await personRepository
+                                .createQueryBuilder("person")
+                                .where("person.email = :email")
+                                .setParameters({ email })
                                 .getOne()
         return person !== undefined
     }
@@ -155,17 +174,17 @@ export class PersonService {
      * @param personId
      * @return {Promise}
      */
-    async deleteOnePerson(personId: string): Promise<DeleteResult> {
+    async deleteOnePerson(personId: string): Promise<any> {
         const personRepository = getRepository(Person);
         let person: Person;
         try {
             person = await personRepository.findOneOrFail(personId);
+            await PersonService.policyService.deletePolicy(personId, personId, 'person');
+            await personRepository.delete(personId)
+            return Promise.resolve()
         } catch (error) {
             throw new DCDError( 404, 'Person to delete ' + personId + ' could not be not found.')
         }
-        return personRepository.delete(personId).then( () => {
-            return PersonService.policyService.revoke(personId, personId, 'person');
-        });
     }
 
     /**

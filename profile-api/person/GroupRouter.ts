@@ -81,9 +81,7 @@ GroupRouter.post(
 **/
 GroupRouter.delete(
     "/:groupId/members/:memberId",
-    [introspectToken(['dcd:groups'])
-    // , checkPolicy('groups','update')
-],
+    [introspectToken(['dcd:groups']), checkPolicy('groups','update')],
     GroupController.removeMembersFromAGroup
 );
 

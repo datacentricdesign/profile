@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { AppService } from 'app/app.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -26,7 +27,8 @@ export class SignUpPageComponent implements OnInit {
   apiURL: string
   constructor(private route: ActivatedRoute,
     private http: HttpClient,
-    private appService: AppService) {
+    private appService: AppService,
+    private toastr: ToastrService) {
       this.apiURL = this.appService.settings.apiURL;
   }
 
@@ -58,6 +60,12 @@ export class SignUpPageComponent implements OnInit {
 
   postSignUp(): void {
     const url = this.apiURL + "/auth/signup?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf
+    if (this.model.password !== this.model.confirmPassword) {
+      return this.toast('The password and its confirmation are not matching.', 'danger')
+    }
+    if (!this.model.email.includes('@')) {
+      return this.toast('You must enter a valid email address.', 'danger')
+    }
     const body = {
       email: this.model.email,
       password: this.model.password,
@@ -66,16 +74,28 @@ export class SignUpPageComponent implements OnInit {
       _csrf: this.csrf,
       challenge: this.login_challenge
     }
-    console.log(body)
     this.http.post(url, body).subscribe((data: any) => {
       console.log(data)
       if (data.error) {
-        this.error = data.error
-        console.log(this.error)
+        this.toast(data.error._hint, 'danger')
       } else if (data.redirect_to) {
         window.location = data.redirect_to
       }
     });
+  }
+
+  toast(message:string, type:string, icon:string = 'nc-alert-circle-i') {
+    this.toastr.info(
+      '<span data-notify="icon" class="nc-icon '+icon+'"></span><span data-notify="message">'+message+'</span>',
+        "",
+        {
+          timeOut: 4000,
+          closeButton: true,
+          enableHtml: true,
+          toastClass: "alert alert-"+type+" alert-with-icon",
+          positionClass: "toast-top-center"
+        }
+      );
   }
 
 }

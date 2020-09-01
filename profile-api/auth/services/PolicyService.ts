@@ -90,10 +90,22 @@ export class PolicyService {
   }
 
   async listRolesOfAMember(member: string) {
-    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles'
+    const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles?member=' + member
     try {
       const res = await fetch(url, { headers: this.ketoHeaders, method: 'GET'});
-      return res.json();
+      const groups = await res.json();
+      console.log(groups)
+      for (let i=0;i<groups.length;i++) {
+        try {
+          const result = await this.check({resource: groups[i].id, subject: member, action: 'dcd:actions:update'})
+          groups[i].isAdmin = true
+        } catch(error) {
+          groups[i].isAdmin = false
+          delete groups[i].members;
+        }
+      }
+      console.log(groups)
+      return Promise.resolve(groups)
     }
     catch (error) {
       return Promise.reject(error);
@@ -101,7 +113,6 @@ export class PolicyService {
   }
 
   async createARole(creator: string, roleId: string, members: string[]) {
-    console.log('creating a role...')
     const url = config.oauth2.acpURL.origin + '/engines/acp/ory/exact/roles'
     const body = JSON.stringify({id: roleId, members: members})
     try {
@@ -199,12 +210,13 @@ export class PolicyService {
   async deletePolicy(subjectId: string, resourceId: string, roleName: string) {
     try {
       const roleId: string = await this.getRoleId(subjectId, resourceId, roleName)
-      // There is an existing policy, let's update
+      // There is an existing policy
       const roleRepository = getRepository(Role);
       await roleRepository.delete(roleId);
       // Use the role id to retrieve and delete associated Keto's policy
       return this.deleteKetoPolicy(roleId)
     } catch (error) {
+      console.log(error)
       return Promise.reject(error); // Otherwise, something went wrong
     }
   }
@@ -234,6 +246,7 @@ export class PolicyService {
    * @returns {Promise<Response>}
    */
   async updateKetoPolicy(policy: any): Promise<Response> {
+    console.log(policy)
     try {
       const result = await fetch(config.oauth2.acpURL.href + 'engines/acp/ory/regex/policies', {
         headers: this.ketoHeaders,
