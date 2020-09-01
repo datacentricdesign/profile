@@ -17,12 +17,12 @@
                             Sign up for a Data-Centric Design Lab Account<br>
                         </p>
 
-                        <a *ngIf="client!==undefined && client.policy_uri!==''"
-                            href="{{data.client.policy_uri}}" target="_blank">Policy</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.tos_uri!==''"
-                            href="{{client.tos_uri}}" target="_blank">Terms of Service</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.contacts!==''"
-                            href="mailto:{{data.client.contacts[0]}}" target="_blank">Contact</a>
+                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{data.client.policy_uri}}"
+                            target="_blank">Policy</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}"
+                            target="_blank">Terms of Service</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{data.client.contacts[0]}}"
+                            target="_blank">Contact</a>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -37,9 +37,24 @@
                                 </span>
 
                                 <div class="form-group">
-                                    <label for="email">Email address</label>
+                                    <label for="username">
+                                        Username (Unique and unchangeable)
+                                    </label>
+                                    <input type="text" class="form-control" id="username" required
+                                        [(ngModel)]="model.username" placeholder="johndoe" name="username"
+                                        #username="ngModel">
+                                    <div [hidden]="username.valid || username.pristine" class="alert alert-danger">
+                                        An email is required
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">
+                                        Email address
+                                    </label>
                                     <input type="email" class="form-control" id="email" required
-                                        [(ngModel)]="model.email" placeholder="lab@datacentricdesign.org" name="email" #email="ngModel">
+                                        [(ngModel)]="model.email" placeholder="lab@datacentricdesign.org" name="email"
+                                        #email="ngModel">
                                     <div [hidden]="email.valid || email.pristine" class="alert alert-danger">An email is
                                         required</div>
                                 </div>
@@ -53,11 +68,35 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" required
-                                        [(ngModel)]="model.password" placeholder="********" name="password" #password="ngModel">
-                                    <div [hidden]="password.valid || password.pristine" class="alert alert-danger">A
-                                        password is required</div>
+                                    <label for="password">Password (at least 8 characters)</label>
+                                    <input type="password" class="form-control" id="password" required minlength="8"
+                                        [(ngModel)]="model.password" placeholder="********" name="password"
+                                        #password="ngModel">
+                                    <div *ngIf="password.invalid && (password.dirty || password.touched)"
+                                        class="alert alert-danger">
+                                        <div *ngIf="password.errors.required">
+                                            A password is required
+                                        </div>
+                                        <div *ngIf="password.errors.minlength">
+                                            Your password must be at least 8 characters long.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="confirmPassword">Confirm your password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" required minlength="8"
+                                        [(ngModel)]="model.confirmPassword" placeholder="********" name="confirmPassword"
+                                        #confirmPassword="ngModel">
+                                    <div *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)"
+                                        class="alert alert-danger">
+                                        <div *ngIf="confirmPassword.errors.required">
+                                            You must confirm your password.
+                                        </div>
+                                        <div *ngIf="confirmPassword.errors.minlength">
+                                            Your password must be at least 8 characters long.
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <input id="remember" type="checkbox" name="remember" value="1">
@@ -69,9 +108,7 @@
                         <hr>
 
                         <div *ngIf="error !== undefined" class="alert alert-danger" role="alert">
-                            <p *ngIf="error.requirements !== undefined" class="danger">{{error.requirements}}</p>
-                            <p *ngIf="error.hint !== undefined" class="danger">{{error.hint}}</p>
-                            <p *ngIf="error.message !== undefined" class="danger">{{error.message}}</p>
+                            <p *ngIf="error._hint !== undefined" class="danger">{{error._hint}}</p>
                         </div>
 
                         <input type="submit" id="submit" name="submit" value="Sign up" class="btn btn-info"

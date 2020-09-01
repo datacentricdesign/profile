@@ -18,8 +18,8 @@ export class SignInPageComponent implements OnInit {
   id: string;
   description: string
   name: string
-  login_challenge:string
-  csrf:string
+  login_challenge: string
+  csrf: string
   client: any
   error: any
   apiURL: string
@@ -28,7 +28,7 @@ export class SignInPageComponent implements OnInit {
     private _router: Router,
     private http: HttpClient,
     private appService: AppService) {
-      this.apiURL = this.appService.settings.apiURL;
+    this.apiURL = this.appService.settings.apiURL;
   }
 
   model: DTOPerson = {
@@ -51,22 +51,29 @@ export class SignInPageComponent implements OnInit {
         })
       )
     });
-
   }
 
   postSignIn(): void {
-    this.http.post(this.apiURL + "/auth/signin?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf, {
-      email: this.model.email,
+    const url = this.apiURL + "/auth/signin?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf
+    // Check whether we deal with an email or a username, and make sure username start with person prefix
+    let emailOrUsername = this.model.email
+    if (!emailOrUsername.includes('@') && !emailOrUsername.startsWith('dcd:persons:')) {
+      emailOrUsername = 'dcd:persons:' + emailOrUsername
+    }
+    // build the body
+    const body = {
+      email: emailOrUsername,
       password: this.model.password,
       _csrf: this.csrf,
       challenge: this.login_challenge
-    }).subscribe((data: any) => {
+    }
+    this.http.post(url, body).subscribe((data: any) => {
       console.log(data)
       if (data.error) {
         this.error = data.error
         console.log(this.error)
       } else if (data.redirect_to) {
-          window.location = data.redirect_to
+        window.location = data.redirect_to
       }
     });
   }

@@ -16,6 +16,7 @@ export const checkPolicy = (resource: string, action: string) => {
             action: 'dcd:actions:' + action,
             subject: req.context.userId
         }
+        console.log(acp)
         AuthController.policyService
             .check(acp)
             .then(() => next())
@@ -33,6 +34,9 @@ function buildACPResource(resource: string, req: Request): string {
     let acpResource = 'dcd:' + resource
     if (req.params.personId !== undefined) {
         acpResource = req.params.personId
+    }
+    if (req.params.groupId !== undefined) {
+        acpResource = req.params.groupId
     }
     return acpResource
 }

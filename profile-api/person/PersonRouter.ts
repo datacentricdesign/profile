@@ -42,6 +42,21 @@ PersonRouter.get(
 );
 
 /**
+ * @api {get} /persons/:personId Check
+ * @apiGroup Person
+ * @apiDescription Check is a person id already exist.
+ *
+ * @apiVersion 0.1.0
+ *
+ * @apiParam {String} persongId Id of the Person to read.
+ *
+ * @apiSuccess {object} person The retrieved Person
+ **/
+PersonRouter.get("/:personId/check",
+    PersonController.checkIfPersonIdExists
+);
+
+/**
      * @api {post} /persons Create
      * @apiGroup Person
      * @apiDescription Create a new Person.
@@ -51,6 +66,7 @@ PersonRouter.get(
      * @apiParam (Body) {Person} person Person to create as JSON.
      * @apiParamExample {json} person:
      *     {
+     *       "id": "johndoe",
      *       "name": "John Doe",
      *       "email": "lab@datacentricdesign.org",
      *       "password": "MyStrongPassword"
@@ -98,14 +114,41 @@ PersonRouter.delete(
     PersonController.deleteOnePerson
 );
 
+/**
+     * @api {get} /persons/:personId/apps List
+     * @apiGroup Apps
+     * @apiDescription List apps' sessions
+     *
+     * @apiVersion 0.1.0
+     *
+     * @apiHeader {String} Authorization TOKEN ID
+     *
+     * @apiParam {String} personId
+     * 
+     * @apiReturn {String} array of app sessions.
+**/
 PersonRouter.get(
-    "/:personId/sessions",
+    "/:personId/apps",
     [introspectToken(['dcd:persons']), checkPolicy('persons', 'read')],
-    PersonController.listAPersonSessions
+    PersonController.listAPersonApps
 );
 
+/**
+     * @api {get} /persons/:personId/apps/:appId Revoke
+     * @apiGroup Apps
+     * @apiDescription Revoke app access
+     *
+     * @apiVersion 0.1.0
+     *
+     * @apiHeader {String} Authorization TOKEN ID
+     *
+     * @apiParam {String} personId
+     * @apiParam {String} appId to remove access
+**/
 PersonRouter.delete(
-    "/:personId/sessions/:clientId",
+    "/:personId/apps/:appId",
     [introspectToken(['dcd:persons']), checkPolicy('persons', 'delete')],
-    PersonController.deleteAPersonSession
+    PersonController.deleteAPersonApp
 );
+
+

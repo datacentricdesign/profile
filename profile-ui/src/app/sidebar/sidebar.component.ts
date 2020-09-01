@@ -11,9 +11,11 @@ export interface RouteInfo {
 }
 
 const dashboardRoute = { path: 'dashboard', title: 'Dashboard', icon: 'nc-layout-11', class: '' }
-const sessionsRoute = { path: 'sessions', title: 'Current Apps', icon: 'nc-book-bookmark', class: '' }
+const appsRoute = { path: 'apps', title: 'Apps', icon: 'nc-book-bookmark', class: '' }
+const groupsRoute = { path: 'groups', title: 'Groups', icon: 'nc-chat-33', class: '' }
 
-export const ROUTES: RouteInfo[] = [dashboardRoute, sessionsRoute];
+
+export const ROUTES: RouteInfo[] = [dashboardRoute, appsRoute, groupsRoute];
 
 @Component({
     moduleId: module.id,

@@ -11,6 +11,11 @@ import config from "./config";
 import errorMiddleware from './person/middlewares/ErrorMiddleware';
 import { PersonRouter } from "./person/PersonRouter";
 import { AuthRouter } from "./auth/AuthRouter";
+import { GroupRouter } from "./person/GroupRouter";
+import { PersonService } from "./person/PersonService";
+import PersonController from "./person/PersonController";
+import { DTOPerson } from "@datacentricdesign/types";
+import AuthController from "./auth/AuthController";
 
 
 waitAndConnect(1000);
@@ -36,7 +41,8 @@ function delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
-function startAPI() {
+async function startAPI() {
+    await init()
     // Create a new express application instance
     const app = express();
 
@@ -55,11 +61,32 @@ function startAPI() {
 
     // Set all routes from routes folder
     app.use(config.http.baseUrl + "/persons", PersonRouter);
+    app.use(config.http.baseUrl + "/groups", GroupRouter);
     app.use(config.http.baseUrl + "/auth", AuthRouter);
     app.use(errorMiddleware)
+
+    app.use(config.http.baseUrl + "/docs", express.static('dist/public/docs'))
 
     // Start listening
     app.listen(config.http.port, () => {
         console.log("Server started on port "+ config.http.port +"!");
     });
+}
+
+async function init() {
+    const exists = await PersonController.personService.checkIfPersonIdExists("dcd:persons:admin");
+    console.log(exists)
+    if (!exists) {
+        // Create an admin user
+        const admin: DTOPerson = {
+            id: "dcd:persons:admin",
+            email: config.env.profileAdminEmail,
+            name: "Admin",
+            password: config.env.profileAdminPass
+        }
+        await AuthController.policyService.createARole(admin.id, "dcd:groups:public", []);
+        await AuthController.policyService.createARole(admin.id, "dcd:groups:user", []);
+        await AuthController.policyService.createARole(admin.id, "dcd:groups:admin", [admin.id]);
+        await PersonController.personService.createNewPerson(admin);
+    }
 }

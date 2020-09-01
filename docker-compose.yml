@@ -3,7 +3,6 @@ version: '3'
 services:
 
   profile-api:
-    # image: datacentricdesign/profile-api:release-0.0.6
     build:
       context: ./profile-api
     container_name: profile-api
@@ -11,9 +10,8 @@ services:
       - HOST_DATA_FOLDER=$HOST_DATA_FOLDER
       
       - NODE_ENV=$NODE_ENV
-      # Only valid with NODE_ENV=development
-      - DEV_USER=$DEV_USER
-      - DEV_TOKEN=$DEV_TOKEN
+      - PROFILE_ADMIN_EMAIL=$PROFILE_ADMIN_EMAIL
+      - PROFILE_ADMIN_PASSWORD=$PROFILE_ADMIN_PASSWORD
       - CRYPTO_ALGO=$CRYPTO_ALGO
       - CRYPTO_KEY=$CRYPTO_KEY
       
@@ -44,7 +42,6 @@ services:
       - ACP_URL=$ACP_URL
 
   profile-ui:
-    # image: datacentricdesign/profile-ui:release-0.0.6
     build:
       context: ./profile-ui
     container_name: profile-ui
@@ -62,8 +59,8 @@ services:
       - POSTGRES_DB=$PROFILE_POSTGRES_DB
     volumes:
       - $HOST_DATA_FOLDER/profile/profile-postgres:/var/lib/postgresql/data
-    # ports:
-    #   - $PROFILE_POSTGRES_PORT:$PROFILE_POSTGRES_PORT
+    ports:
+      - $PROFILE_POSTGRES_PORT:$PROFILE_POSTGRES_PORT
 
 networks: 
     default:
