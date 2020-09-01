@@ -86,6 +86,13 @@ export class PersonService {
         return person
     }
 
+    async checkPerson(personEmailOrId: string, personPassword: string) {
+        if (personEmailOrId.includes('@')) {
+            return this.checkPersonByEmailPassword(personEmailOrId, personPassword)
+        }
+        return this.checkPersonByIdPassword(personEmailOrId, personPassword)
+    }
+
     /**
      * Check if the combination email/password exists.
      * @param {string} personEmail

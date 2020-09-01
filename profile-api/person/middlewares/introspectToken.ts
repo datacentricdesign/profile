@@ -15,16 +15,17 @@ export const introspectToken = (requiredScope: string[]) => {
         const token = extractToken(req)
         return AuthController.authService.refresh()
             .then(() => {
-                    return AuthController.authService
-                        .introspect(token, requiredScope)
+                console.log('introspect')
+                return AuthController.authService
+                    .introspect(token, requiredScope)
             })
-            .then((user:any) => {
+            .then((user: any) => {
                 req.context = {
                     userId: user.sub
                 }
-                next()
+                return next()
             })
-            .catch((error: DCDError ) => next(error))
+            .catch((error: DCDError) => next(error))
     }
 };
 
@@ -35,6 +36,8 @@ export const introspectToken = (requiredScope: string[]) => {
  * @return {*|void|string}
  */
 function extractToken(req: Request): any | void | string {
+
+    console.log(req.headers)
     if (req.get('Authorization') === undefined) {
         throw new DCDError(4031, 'Add \'Authorization\' header.')
     } else if (

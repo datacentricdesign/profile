@@ -82,7 +82,7 @@ export class AuthController {
         // The challenge is now a hidden input field,
         // so let's take it from the request body instead
         console.log("postSignIn")
-        AuthController.personService.checkPersonByEmailPassword(req.body.email, req.body.password)
+        AuthController.personService.checkPerson(req.body.email, req.body.password)
             .then(userId => {
                 console.log(userId)
                 // Tell hydra to login this user
@@ -476,7 +476,7 @@ function login(req, res, next) {
 }
 
 
-function buildIDToken(grant_scope, user) {
+function buildIDToken(grant_scope: string[], user) {
     const idToken: any = {};
     // This is the openid 'profile' scope which should include
     // some user profile data. (optional)
@@ -485,10 +485,10 @@ function buildIDToken(grant_scope, user) {
         idToken.sub = user.id;
         idToken.name = user.name;
         idToken.teams = "1";
-        idToken.given_namame = "";
+        idToken.given_name = "";
         idToken.profilee = user.name;
         idToken.family_n = "";
-        idToken.grafana_role = "Editor";
+        idToken.grafana_role = "Viewer";
     }
 
     // This is to fulfill the openid 'email' scope which returns

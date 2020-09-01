@@ -15,7 +15,7 @@ export class GroupController {
             const result: any = await GroupController.policyService.listRolesOfAMember(req.context.userId)
             res.send(result);
         } catch (error) {
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 
@@ -34,10 +34,10 @@ export class GroupController {
                     const result: any = await GroupController.policyService.createARole(req.context.userId, group.id, group.members)
                     return res.status(201).send();
                 } catch (error) {
-                    return res.status(500).send(error);
+                    return req.next(error);
                 }
             }
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 
@@ -48,7 +48,7 @@ export class GroupController {
             const result: any = await GroupController.policyService.deleteARole(groupId)
             res.status(204).send();
         } catch (error) {
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 
@@ -61,7 +61,7 @@ export class GroupController {
             if (error.errorCode === 404) {
                 return res.status(404).send({'exists': false});
             }
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 
@@ -74,7 +74,7 @@ export class GroupController {
                 res.status(204).send();
             }
         } catch (error) {
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 
@@ -83,11 +83,14 @@ export class GroupController {
         const memberId: string = req.params.memberId
         try {
             const result: any = await GroupController.policyService.removeAMemberFromRole(groupId, memberId)
+            const json = await result.json()
+            console.log(result.ok)
             if (result.ok) {
-                res.status(204).send();
+                return res.status(204).send();
             }
+            return req.next(new DCDError(404, 'Not found'));
         } catch (error) {
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 
@@ -97,7 +100,7 @@ export class GroupController {
             const result: any = await GroupController.policyService.readRole(groupId)
             res.send(result.json());
         } catch (error) {
-            res.status(500).send(error);
+            req.next(error);
         }
     };
 }

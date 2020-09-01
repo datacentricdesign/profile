@@ -84,9 +84,9 @@ async function init() {
             name: "Admin",
             password: config.env.profileAdminPass
         }
-        const resultGroup = await AuthController.policyService.createARole(admin.id, "dcd:groups:public", []);
+        await AuthController.policyService.createARole(admin.id, "dcd:groups:public", []);
         await AuthController.policyService.createARole(admin.id, "dcd:groups:user", []);
         await AuthController.policyService.createARole(admin.id, "dcd:groups:admin", [admin.id]);
-        const resultCreate = await PersonController.personService.createNewPerson(admin);
+        await PersonController.personService.createNewPerson(admin);
     }
 }

@@ -1,0 +1,71 @@
+<h1>Groups</h1>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <form (ngSubmit)="createGroup()" #propertyForm="ngForm">
+            dcd:groups:
+            <div class="form-group" style="display:inline-block">
+                <label for="groupId"></label>
+                <input type="text" class="form-control" id="grouId" required [(ngModel)]="groupModel.groupId"
+                    name="groupId" #groupId="ngModel">
+            </div>
+            <button type="submit" style="margin-left: 10px;margin-top: 7px;" class="btn btn-success">
+                Create a New Group
+            </button>
+        </form>
+    </div>
+
+</div>
+<div *ngIf="groups$ | async as groups">
+    <div class="row" *ngFor="let group of groups">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{group.id}}</h3>
+                </div>
+
+                <div class="card-body">
+                    dcd:persons:
+                    <div class="form-group" style="display:inline-block">
+                        <label for="newMemberId-{{group.id}}"></label>
+                        <input type="text" class="form-control" id="nameNewMemberInGroup-{{group.id}}" required
+                            name="nameNewMemberId-{{group.id}}">
+                    </div>
+                    <button style="margin-left: 10px;margin-top: 7px;" type="button" (click)="addMember($event)" id="newMemberInGroup-{{group.id}}" class="btn btn-info">
+                        Add Person To Group
+                    </button>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class=" text-primary">
+                                <th style="max-width:200px">
+                                    Username
+                                </th>
+                                <th>
+
+                                </th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let member of group.members; let iMember = index">
+                                    <td>
+                                        {{member}}
+                                    </td>
+                                    <td style="max-width:60px">
+                                        <button id="removeMember-{{member}}-FromGroup-{{group.id}}" type="button" (click)="removeMember($event)" class="btn btn-warning">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" (click)="deleteGroup($event)" id="deleteGroup-{{group.id}}" class="btn btn-danger">
+                        Delete group
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

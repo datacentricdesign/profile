@@ -26,8 +26,8 @@
                                 <input type="hidden" name="challenge" value={{login_challenge}}>
                                             
                                 <div class="form-group">
-                                <label for="email">Email address</label>
-                                <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email" placeholder="lab@datacentricdesign.org" #email="ngModel">
+                                <label for="email">Username or Email address</label>
+                                <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email" placeholder="" #email="ngModel">
                                 <div [hidden]="email.valid || email.pristine" class="alert alert-danger">Your email is required</div>
                                 </div>
                         

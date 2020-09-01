@@ -34,7 +34,7 @@ export class SignUpPageComponent implements OnInit {
     email: '',
     password: '',
     name: '',
-    id: '',
+    username: '',
     confirmPassword: ''
   }
 
@@ -57,13 +57,17 @@ export class SignUpPageComponent implements OnInit {
   }
 
   postSignUp(): void {
-    this.http.post(this.apiURL + "/auth/signup?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf, {
+    const url = this.apiURL + "/auth/signup?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf
+    const body = {
       email: this.model.email,
       password: this.model.password,
       name: this.model.name,
+      id: 'dcd:persons:' + this.model.username,
       _csrf: this.csrf,
       challenge: this.login_challenge
-    }).subscribe((data: any) => {
+    }
+    console.log(body)
+    this.http.post(url, body).subscribe((data: any) => {
       console.log(data)
       if (data.error) {
         this.error = data.error
