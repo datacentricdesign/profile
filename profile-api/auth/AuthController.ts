@@ -483,12 +483,11 @@ function buildIDToken(grant_scope: string[], user) {
     if (grant_scope.indexOf("profile") > 0) {
         idToken.id = user.id;
         idToken.sub = user.id;
+        idToken.username = user.id.replace('dcd:persons:', '');
         idToken.name = user.name;
-        idToken.teams = "1";
-        idToken.given_name = "";
-        idToken.profilee = user.name;
+        idToken.given_name = user.name;
+        idToken.profile = user.name;
         idToken.family_n = "";
-        idToken.grafana_role = "Viewer";
     }
 
     // This is to fulfill the openid 'email' scope which returns
