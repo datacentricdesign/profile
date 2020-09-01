@@ -59,8 +59,8 @@ services:
       - POSTGRES_DB=$PROFILE_POSTGRES_DB
     volumes:
       - $HOST_DATA_FOLDER/profile/profile-postgres:/var/lib/postgresql/data
-    ports:
-      - $PROFILE_POSTGRES_PORT:$PROFILE_POSTGRES_PORT
+    # ports:
+    #   - $PROFILE_POSTGRES_PORT:$PROFILE_POSTGRES_PORT
 
 networks: 
     default:
