@@ -40,6 +40,7 @@ export class SignUpPageComponent implements OnInit {
     confirmPassword: ''
   }
 
+  fieldTextPasswordType: boolean;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -96,6 +97,10 @@ export class SignUpPageComponent implements OnInit {
           positionClass: "toast-top-center"
         }
       );
+  }
+
+  toggleFieldTextPasswordType() {
+    this.fieldTextPasswordType = !this.fieldTextPasswordType;
   }
 
 }
