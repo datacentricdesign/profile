@@ -61,12 +61,6 @@ export class SignUpPageComponent implements OnInit {
 
   postSignUp(): void {
     const url = this.apiURL + "/auth/signup?login_challenge=" + this.login_challenge + "&_csrf=" + this.csrf
-    if (this.model.password !== this.model.confirmPassword) {
-      return this.toast('The password and its confirmation are not matching.', 'danger')
-    }
-    if (!this.model.email.includes('@')) {
-      return this.toast('You must enter a valid email address.', 'danger')
-    }
     const body = {
       email: this.model.email,
       password: this.model.password,
