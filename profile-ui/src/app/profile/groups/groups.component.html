@@ -66,22 +66,30 @@
                 </div>
 
                 <div class="card-body">
-                    dcd:persons:
                     <div class="form-group" style="display:inline-block">
+                    </div>
+                    <div class="input-group">
                         <label for="newMemberId-{{group.id}}"></label>
                         <input type="text" class="form-control" id="nameNewMemberInGroup-{{group.id}}" required
                             name="nameNewMemberId-{{group.id}}">
+                        <div class="input-group-append">
+                            <select class="input-group-text" class="form-control" id="typeNewMemberInGroup-{{group.id}}">
+                                <option value="dcd:persons" selected="selected">Person</option>
+                                <option value="dcd:groups">Group</option>
+                                <option value="dcd:things">Thing</option>
+                            </select>
+                        </div>
                     </div>
                     <button style="margin-left: 10px;margin-top: 7px;" type="button" (click)="addMember($event)"
                         id="newMemberInGroup-{{group.id}}" class="btn btn-info">
-                        Add Person To Group
+                        Add to {{group.id}}
                     </button>
 
                     <div class="table-responsive">
                         <table class="table">
                             <thead class=" text-primary">
                                 <th style="max-width:200px">
-                                    Username
+                                    Subject
                                 </th>
                                 <th>
 

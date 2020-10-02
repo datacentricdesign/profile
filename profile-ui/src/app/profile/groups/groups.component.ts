@@ -58,10 +58,15 @@ export class GroupsComponent implements OnInit {
 
   addMember(event) {
     const groupId = event.target.id.replace('newMemberInGroup-', '')
-    const personId = (document.getElementById('nameNewMemberInGroup-' + groupId) as HTMLInputElement).value
-    if (personId !== '') {
-      console.log(personId)
-      this.personService.addMembersToAGroup(groupId, ['dcd:persons:' + personId]).then(result => {
+    const typeSubject = (document.getElementById('typeNewMemberInGroup-' + groupId) as HTMLInputElement).value
+    const subjectId = (document.getElementById('nameNewMemberInGroup-' + groupId) as HTMLInputElement).value
+    if (subjectId !== '') {
+      console.log(subjectId)
+      let subject = subjectId
+      if (!subject.startsWith('dcd:')) {
+        subject = typeSubject + ':' + subject
+      }
+      this.personService.addMembersToAGroup(groupId, [subject]).then(result => {
         window.location.reload(true)
       }).catch(error => {
         console.log(error)
