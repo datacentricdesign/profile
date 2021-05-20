@@ -11,6 +11,7 @@
 
 # stage 2
 FROM node:14.6.0-alpine
+ARG START_COMMAND
 # Create app directory
 WORKDIR /usr/app
 # Install ONLY prod dependencies
@@ -22,4 +23,4 @@ RUN npm install
 COPY . .
 COPY ./scopes.json .
 # Run the production script
-CMD [ "npm", "run", "prod" ]
+CMD [ "npm", "run", "${START_COMMAND}" ]
