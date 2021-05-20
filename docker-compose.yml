@@ -6,7 +6,7 @@ services:
     build:
       context: ./profile-api
       args:
-        - START_COMMAND=$PROFILE_API_START_COMMAND
+        START_COMMAND: $PROFILE_API_START_COMMAND
     container_name: profile-api
     environment: 
       - HOST_DATA_FOLDER=$HOST_DATA_FOLDER
