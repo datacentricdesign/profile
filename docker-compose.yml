@@ -5,6 +5,8 @@ services:
   profile-api:
     build:
       context: ./profile-api
+      args:
+        - START_COMMAND=$PROFILE_API_START_COMMAND
     container_name: profile-api
     environment: 
       - HOST_DATA_FOLDER=$HOST_DATA_FOLDER
@@ -44,6 +46,10 @@ services:
   profile-ui:
     build:
       context: ./profile-ui
+      args:
+        - BASE_HREF=$PROFILE_UI_BASE_HREF
+        - DEPLOY_URL=$PROFILE_UI_DEPLOY_URL
+        - CONFIGURATION=$PROFILE_UI_CONFIGURATION
     container_name: profile-ui
     environment:
      - NGINX_HOST=dwd.tudelft.nl

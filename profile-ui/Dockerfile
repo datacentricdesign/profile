@@ -1,5 +1,8 @@
 # stage1 as builder
 FROM node:10-alpine as builder
+ARG BASE_HREF
+ARG DEPLOY_URL
+ARG CONFIGURATION
 
 # copy the package.json to install dependencies
 COPY package*.json ./
@@ -12,7 +15,7 @@ WORKDIR /profile-ui
 COPY . .
 
 # Build the project and copy the files
-RUN npm run build -- --base-href="https://dwd.tudelft.nl/profile/" --deploy-url="/profile/" --prod
+RUN npm run build -- --base-href="${BASE_HREF}" --deploy-url="${DEPLOY_URL}" --configuration="${CONFIGURATION}"
 
 FROM nginx:alpine
 
