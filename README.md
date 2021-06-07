@@ -14,8 +14,3 @@
 User management of the Data-Centric Design tools
 
 [Profile page](https://datacentricdesign.org/profile)
-
-
-# Test with Postman
-
-You can import in Postman the environment and the API collection from the subfolder profile-api/postman.
