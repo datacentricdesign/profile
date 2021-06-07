@@ -2,7 +2,9 @@ import {Request, Response, Router, NextFunction} from "express";
 import {validate} from "class-validator";
 
 import {Person} from "./Person";
+import { DTOPerson } from "@datacentricdesign/types";
 import {PersonService} from "./PersonService"
+import AuthController from "../auth/AuthController";
 
 export class PersonController {
 
@@ -13,6 +15,7 @@ export class PersonController {
     };
 
     static getOnePersonById = async (req: Request, res: Response) => {
+        console.log('get one person')
         // Get the ID from the url
         const personId: string = req.params.personId;
         try {
@@ -20,17 +23,57 @@ export class PersonController {
             const person: Person = await PersonController.personService.getOnePersonById(personId)
             res.send(person);
         } catch (error) {
+            console.log(error)
             res.status(404).send("Person not found");
+        }
+    };
+
+    static checkIfPersonIdExists = async (req: Request, res: Response, next: NextFunction) => {
+        // Get the ID from the url
+        const personId: string = req.params.personId;
+        try {
+            // Get the Person from the Service
+            const exists: boolean = await PersonController.personService.checkIfPersonIdExists(personId)
+            res.send({exists: exists});
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    static listAPersonApps = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const personId: string = req.params.personId;
+        try {
+            const sessions: any = await AuthController.authService.listAPersonApps(personId)
+            res.send(sessions);
+        } catch (error) {
+            res.status(404).send("Person's apps not found");
+        }
+    };
+
+    static deleteAPersonApp = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const personId: string = req.params.personId;
+        const clientId: string = req.params.clientId;
+        try {
+            await AuthController.authService.deleteAPersonApp(personId, clientId)
+            res.status(204).send();
+        } catch (error) {
+            console.log(error)
+            res.status(404).send("Person's apps not found");
         }
     };
 
     static createNewPerson = async (req: Request, res: Response, next: NextFunction) => {
         // Get parameters from the body
-        let {name, password, email} = req.body;
-        let person = new Person();
-        person.name = name;
-        person.password = password
-        person.email = email
+        let {id, name, password, email} = req.body;
+        let person: DTOPerson;
+        person = {
+            id: id,
+            name: name,
+            password: password,
+            email: email
+        }
 
         // Validade if the parameters are ok
         const errors = await validate(person);
@@ -93,6 +136,8 @@ export class PersonController {
             next(error)
         }
     };
+
+    
 };
 
 export default PersonController;

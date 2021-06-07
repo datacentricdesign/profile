@@ -23,8 +23,8 @@ export class Person implements IPerson {
     @Column()
     name: string;
 
-    @Column()
-    password: string;
+    @Column({select: false})
+    password?: string;
 
     @Column()
     @CreateDateColumn()

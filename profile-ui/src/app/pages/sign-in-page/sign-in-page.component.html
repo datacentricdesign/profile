@@ -4,17 +4,20 @@
             <form (ngSubmit)="postSignIn()" #signInForm="ngForm" *ngIf="auth$ | async as data else noData">
                 <div class="card card-stats" style="max-width: 500px;margin:auto">
                     <div class="card-header" style="text-align:center;">
-                        <span *ngIf="data.client.logo_uri !== ''">
+                        <span *ngIf="data.client.client_id!='clients:profile-ui' && data.client.logo_uri !== ''">
                             <img src="{{data.client.logo_uri}}" style="max-width: 150px;" />
                             <i class="nc-icon nc-simple-add"></i>
                         </span>
-                        <img src="/assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
-                        <p *ngIf="client !== undefined">
+                        <img src="./assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
+                        <p *ngIf="client !== undefined && client.client_id!='clients:profile-ui'">
                             Sign in to <b>{{client.client_name || client.client_id}}</b> with your <br>Data-Centric Design Lab Account.
                         </p>
-                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{client.policy_uri}}">Policy</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}">Terms of Service</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{client.contacts[0]}}">Contact</a>
+                        <p *ngIf="client !== undefined && client.client_id=='clients:profile-ui'">
+                            Sign in to your <br>Data-Centric Design Lab Account.
+                        </p>
+                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{client.policy_uri}}" target="_blank">Policy</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}" target="_blank">Terms of Service</a>&nbsp;/&nbsp;
+                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{client.contacts[0]}}" target="_blank">Contact</a>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -23,8 +26,8 @@
                                 <input type="hidden" name="challenge" value={{login_challenge}}>
                                             
                                 <div class="form-group">
-                                <label for="email">Email address</label>
-                                <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email" placeholder="lab@datacentricdesign.org" #email="ngModel">
+                                <label for="email">Username or Email address</label>
+                                <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email" placeholder="" #email="ngModel">
                                 <div [hidden]="email.valid || email.pristine" class="alert alert-danger">Your email is required</div>
                                 </div>
                         
@@ -43,14 +46,14 @@
                         <hr>
 
                         <div *ngIf="error !== undefined" class="alert alert-danger" role="alert">
-                            <p *ngIf="error.requirements !== undefined" class="danger">{{error.requirements}}</p>
-                            <p *ngIf="error.hint !== undefined" class="danger">{{error.hint}}</p>
+                            <p *ngIf="error._requirements !== undefined" class="danger">{{error._requirements}}</p>
+                            <p *ngIf="error._hint !== undefined" class="danger">{{error._hint}}</p>
                             <p *ngIf="error.message !== undefined" class="danger">{{error.message}}</p>
                         </div>
 
                         <input type="submit" id="submit" name="submit" value="Sign in" class="btn btn-success" [disabled]="!signInForm.form.valid">
                         <span style="float: right;text-align:right;padding-top: 5px;">
-                            New to DCD Lab? <a href="/signup?login_challenge={{login_challenge}}">Create an account</a>
+                            New to DCD Lab? <a href="./signup?login_challenge={{login_challenge}}">Create an account</a>
                         </span>
                     </div>
                 </div>

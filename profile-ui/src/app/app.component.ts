@@ -1,40 +1,7 @@
 import { Component } from '@angular/core';
-import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
-
-
-// import { AuthConfig } from 'angular-oauth2-oidc';
- 
-//   export const authCodeFlowConfig: AuthConfig = {
-//     // Url of the Identity Provider
-//     issuer: 'http://localhost:8081/',
- 
-//     // URL of the SPA to redirect the user to after login
-//     redirectUri: "http://localhost:4200",
- 
-//     // The SPA's id. The SPA is registerd with this id at the auth-server
-//     // clientId: 'server.code',
-//     clientId: 'clients:bucket-app-ui',
- 
-//     // Just needed if your auth server demands a secret. In general, this
-//     // is a sign that the auth server is not configured with SPAs in mind
-//     // and it might not enforce further best practices vital for security
-//     // such applications.
-//     // dummyClientSecret: 'secret',
- 
-//     responseType: 'code',
- 
-//     // set the scope for the permissions the client should request
-//     // The first four are defined by OIDC.
-//     // Important: Request offline_access to get a refresh token
-//     // The api scope is a usecase specific one
-//     scope: 'openid offline email dcd:things',
- 
-//     showDebugInformation: true,
- 
-//     // Not recommented:
-//     // disablePKCI: true,
-//   };
-
+import { OAuthService } from 'angular-oauth2-oidc';
+import { filter } from 'rxjs/operators';
+import { AppService } from './app.service';
 
   @Component({
     selector: 'app-root',
@@ -43,11 +10,40 @@ import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
   })
 export class AppComponent {
 
-  constructor(/*private oauthService: OAuthService*/) {
-    // this.oauthService.configure(authCodeFlowConfig);
-    // this.oauthService.loadDiscoveryDocumentAndTryLogin();
+  constructor(private oauthService: OAuthService, private appService: AppService) {
+    this.configureCodeFlow();
 
-    // this.oauthService.initLoginFlow();
+    // Automatically load user profile
+    this.oauthService.events
+      .pipe(filter(e => e.type === 'token_received'))
+      .subscribe(_ => {
+        console.debug('state', this.oauthService.state);
+        this.oauthService.loadUserProfile();
+        window.location.href = './persons/dashboard'
+      });
+
+    // Display all events
+    this.oauthService.events.subscribe(e => {
+      console.debug('oauth/oidc event', e);
+    });
   }
+
+  private configureCodeFlow() {
+    this.oauthService.configure(this.appService.settings.authCodeFlow);
+    this.oauthService.requestAccessToken = true;
+
+    console.log("app component")
+    if (
+      this.oauthService.hasValidAccessToken() &&
+      this.oauthService.hasValidIdToken()
+    ) {
+      console.log("=> yes")
+    } else {
+      console.log("=> no")
+    }
+
+
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
+  }  
 
 }

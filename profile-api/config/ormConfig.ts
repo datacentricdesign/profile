@@ -1,14 +1,15 @@
+import 'dotenv/config'
 import { ConnectionOptions } from 'typeorm';
 
 export const ORMConfig: ConnectionOptions = {
     type: 'postgres',
-    host: process.env.POSTGRES_HOST,
-    port: Number(process.env.POSTGRES_PORT),
-    username: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    database: process.env.POSTGRES_DB,
+    host: process.env.PROFILE_POSTGRES_HOST,
+    port: Number(process.env.PROFILE_POSTGRES_PORT),
+    username: process.env.PROFILE_POSTGRES_USER,
+    password: process.env.PROFILE_POSTGRES_PASSWORD,
+    database: process.env.PROFILE_POSTGRES_DB,
     synchronize: true,
-    logging: Boolean(process.env.POSTGRES_LOGGING),
+    logging: Boolean(process.env.PROFILE_POSTGRES_LOGGING),
     entities: [
         "./person/Person.ts",
         "./person/role/Role.ts",

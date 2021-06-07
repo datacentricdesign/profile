@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { FormGroup } from '@angular/forms';
+import { AppService } from 'app/app.service';
 
 @Component({
   selector: 'app-consent-page',
@@ -24,6 +25,7 @@ export class ConsentPageComponent implements OnInit {
   user:any
   requested_scope: any
   scopes: string
+  apiURL: string
 
   model: any = {
     remember: false
@@ -31,16 +33,20 @@ export class ConsentPageComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
     private _router: Router,
-    private http: HttpClient) {
+    private http: HttpClient,
+    private appService: AppService) {
+      this.apiURL = this.appService.settings.apiURL;
   }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      console.log(params)
       this.consent_challenge = params["consent_challenge"]
-      this.auth$ = this.http.get<any>("http://localhost:8082/auth/consent?consent_challenge=" + this.consent_challenge).pipe(
+      this.auth$ = this.http.get<any>(this.apiURL + "/auth/consent?consent_challenge=" + this.consent_challenge).pipe(
         map((data: any) => {
-          console.log(data)
+          if (data.redirect_to !== undefined) {
+            window.location.href = data.redirect_to
+            return false
+          }
           this.csrf = data.csrfToken
           this.client = data.client
           this.user = data.user
@@ -55,7 +61,7 @@ export class ConsentPageComponent implements OnInit {
   }
 
   postConsent(value:string): void {
-    this.http.post("http://localhost:8082/auth/consent?consent_challenge=" + this.consent_challenge + "&_csrf=" + this.csrf, {
+    this.http.post(this.apiURL + "/auth/consent?consent_challenge=" + this.consent_challenge + "&_csrf=" + this.csrf, {
       _csrf: this.csrf,
       challenge: this.consent_challenge,
       scopes: this.scopes,
