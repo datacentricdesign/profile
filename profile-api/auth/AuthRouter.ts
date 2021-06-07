@@ -13,7 +13,7 @@ export const AuthRouter = Router();
  * @apiGroup Auth
  * @apiDescription Get Health status of Auth API
  *
- * @apiVersion 0.1.0
+ * @apiVersion 0.1.1
  *
  * @apiSuccess {object} health status
 **/
