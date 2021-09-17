@@ -9,6 +9,21 @@
     "name": "Access Things",
     "desc": "Access the details of Things I am allowed to access."
   },
+  "dcd:properties": {
+    "id": "dcd:properties",
+    "name": "Access Properties",
+    "desc": "Access the details of Properties I am allowed to access."
+  },
+  "dcd:types": {
+    "id": "dcd:types",
+    "name": "Manage Property Types",
+    "desc": "Manages Property Types."
+  },
+  "dcd:consents": {
+    "id": "dcd:consents",
+    "name": "Manage Consents",
+    "desc": "Manages the consents of Properties I am allowed to manage."
+  },
   "dcd:persons": {
     "id": "dcd:persons",
     "name": "Access Persons",

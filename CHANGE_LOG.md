@@ -7,4 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+
+## [0.1.2] - 2021-06-07
+
+- added some scopes
+
 ## [0.1.1] - 2021-06-07
