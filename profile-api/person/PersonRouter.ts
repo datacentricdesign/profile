@@ -12,7 +12,7 @@ export const PersonRouter = Router();
  * @apiGroup Person
  * @apiDescription Get Health status of Persons API
  *
- * @apiVersion 0.1.1
+ * @apiVersion 0.1.2
  *
  * @apiSuccess {object} health status
 **/
@@ -27,7 +27,7 @@ PersonRouter.get(
  * @apiGroup Person
  * @apiDescription Get one Person.
  *
- * @apiVersion 0.1.1
+ * @apiVersion 0.1.2
  *
  * @apiHeader {String} Authorization TOKEN ID
  *
@@ -46,7 +46,7 @@ PersonRouter.get(
  * @apiGroup Person
  * @apiDescription Check is a person id already exist.
  *
- * @apiVersion 0.1.1
+ * @apiVersion 0.1.2
  *
  * @apiParam {String} persongId Id of the Person to read.
  *
@@ -61,7 +61,7 @@ PersonRouter.get("/:personId/check",
      * @apiGroup Person
      * @apiDescription Create a new Person.
      *
-     * @apiVersion 0.1.1
+     * @apiVersion 0.1.2
      *
      * @apiParam (Body) {Person} person Person to create as JSON.
      * @apiParamExample {json} person:
@@ -85,7 +85,7 @@ PersonRouter.post(
      * @apiGroup Person
      * @apiDescription Edit one Person.
      *
-     * @apiVersion 0.1.1
+     * @apiVersion 0.1.2
      *
      * @apiHeader {String} Authorization TOKEN ID
      *
@@ -102,7 +102,7 @@ PersonRouter.patch(
      * @apiGroup Person
      * @apiDescription Delete one Person.
      *
-     * @apiVersion 0.1.1
+     * @apiVersion 0.1.2
      *
      * @apiHeader {String} Authorization TOKEN ID
      *
@@ -119,7 +119,7 @@ PersonRouter.delete(
      * @apiGroup Apps
      * @apiDescription List apps' sessions
      *
-     * @apiVersion 0.1.1
+     * @apiVersion 0.1.2
      *
      * @apiHeader {String} Authorization TOKEN ID
      *
@@ -138,7 +138,7 @@ PersonRouter.get(
      * @apiGroup Apps
      * @apiDescription Revoke app access
      *
-     * @apiVersion 0.1.1
+     * @apiVersion 0.1.2
      *
      * @apiHeader {String} Authorization TOKEN ID
      *
