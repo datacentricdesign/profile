@@ -69,7 +69,6 @@ export class ConsentPageComponent implements OnInit {
       user: this.user,
       remember: this.model.remember
     }).subscribe((data: any) => {
-      console.log(data)
       if (data.error) {
         this.error = data.error
         console.log(this.error)

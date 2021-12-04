@@ -61,7 +61,6 @@ export class GroupsComponent implements OnInit {
     const typeSubject = (document.getElementById('typeNewMemberInGroup-' + groupId) as HTMLInputElement).value
     const subjectId = (document.getElementById('nameNewMemberInGroup-' + groupId) as HTMLInputElement).value
     if (subjectId !== '') {
-      console.log(subjectId)
       let subject = subjectId
       if (!subject.startsWith('dcd:')) {
         subject = typeSubject + ':' + subject

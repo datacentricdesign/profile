@@ -44,11 +44,9 @@ export class SignUpPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      console.log(params)
       this.login_challenge = params["login_challenge"]
       this.auth$ = this.http.get<any>(this.apiURL + "/auth/signup?login_challenge=" + params["login_challenge"]).pipe(
         map((data: any) => {
-          console.log(data)
           this.csrf = data.csrfToken
           this.client = data.client
           return data;
@@ -70,7 +68,6 @@ export class SignUpPageComponent implements OnInit {
       challenge: this.login_challenge
     }
     this.http.post(url, body).subscribe((data: any) => {
-      console.log(data)
       if (data.error) {
         this.toast(data.error._hint, 'danger')
       } else if (data.redirect_to) {
