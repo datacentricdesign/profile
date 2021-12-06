@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-export const envConfig: any = {
+export const envConfig = {
   env: process.env.NODE_ENV,
   profileAdminEmail: process.env.PROFILE_ADMIN_EMAIL,
   profileAdminPass: process.env.PROFILE_ADMIN_PASSWORD,

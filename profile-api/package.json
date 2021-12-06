@@ -28,6 +28,7 @@
   "homepage": "https://github.com/datacentricdesign/profile#readme",
   "dependencies": {
     "@datacentricdesign/types": "0.0.5",
+    "@ory/hydra-client": "^1.10.6",
     "apidoc": "0.24.0",
     "body-parser": "1.19.0",
     "class-validator": "^0.13.2",

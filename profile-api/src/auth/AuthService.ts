@@ -1,14 +1,14 @@
-import fetch from "node-fetch";
-import { RequestInit } from "node-fetch";
-import * as qs from "querystring";
 import * as SimpleOauth from "simple-oauth2";
 import { DCDError } from "@datacentricdesign/types";
-import { PolicyService } from "../policy/PolicyService";
 import config from "../config";
 import { URL } from "url";
 import * as fs from "fs";
-import { Log } from "../Logger";
 import { User } from "./User";
+import {
+  AdminApi,
+  Configuration,
+  PreviousConsentSession,
+} from "@ory/hydra-client";
 
 export interface KeySet {
   algorithm: string;
@@ -43,22 +43,6 @@ export interface OpenID {
   phone_verified?: boolean;
 }
 
-interface IntrospectionResult {
-  active: boolean;
-  aud: string[];
-  client_id: string;
-  exp: number;
-  ext: Record<string, unknown>;
-  iat: number;
-  iss: string;
-  nbf: number;
-  obfuscated_subject: string;
-  scope: string;
-  sub: string;
-  token_type: string;
-  username: string;
-}
-
 /**
  * This class handle Authentication and Authorisation processes
  */
@@ -75,17 +59,17 @@ export class AuthService {
   private scopeLib = JSON.parse(fs.readFileSync("scopes.json", "utf8"));
 
   private oauth2: SimpleOauth.ClientCredentials;
-  private token = null;
-  private jwtTokenMap = [];
-  private policyService: PolicyService;
+  private token: SimpleOauth.AccessToken = null;
+
+  private hydraAdmin: AdminApi;
+  private headers: Record<string, string>;
 
   private constructor() {
-    this.policyService = PolicyService.getInstance();
-    const header = {
+    this.headers = {
       Accept: "application/json",
     };
     if (config.http.secured) {
-      header["X-Forwarded-Proto"] = "https";
+      this.headers["X-Forwarded-Proto"] = "https";
     }
     const params: SimpleOauth.ModuleOptions = {
       client: {
@@ -98,13 +82,20 @@ export class AuthService {
         revokePath: new URL(config.oauth2.oAuth2RevokeURL).pathname,
       },
       http: {
-        headers: header,
+        headers: this.headers,
       },
       options: {
         bodyFormat: "form",
       },
     };
     this.oauth2 = new SimpleOauth.ClientCredentials(params);
+
+    this.hydraAdmin = new AdminApi(
+      new Configuration({
+        basePath: config.oauth2.oAuth2HydraAdminURL,
+        accessToken: this.refreshTokenIfExpired(),
+      })
+    );
   }
 
   /**
@@ -113,108 +104,53 @@ export class AuthService {
    * @return {Promise<any>}
    */
   async introspect(token: string, requiredScope: string[] = []): Promise<User> {
-    const body = { token: token, scope: requiredScope.join(" ") };
-    const url = config.oauth2.oAuth2IntrospectURL;
-
-    try {
-      const result: IntrospectionResult = await this.authorisedRequest(
-        "POST",
-        url,
-        body,
-        "application/x-www-form-urlencoded"
-      );
-      if (!result.active) {
-        return Promise.reject(
-          new DCDError(4031, "The bearer token is not active")
-        );
-      }
-      if (result.token_type && result.token_type !== "access_token") {
-        return Promise.reject(
-          new DCDError(4031, "The bearer token is not an access token")
-        );
-      }
-      return Promise.resolve({
-        entityId: result.sub,
-        token: token,
-        sub: result.sub,
-        exp: result.exp,
-        token_type: result.token_type,
+    return this.hydraAdmin
+      .introspectOAuth2Token(token, requiredScope.join(" "), {
+        headers: this.headers,
+      })
+      .then((response) => {
+        const intro = response.data;
+        if (!intro.active) {
+          return Promise.reject(
+            new DCDError(4031, "The bearer token is not active")
+          );
+        }
+        if (intro.token_type && intro.token_type !== "access_token") {
+          return Promise.reject(
+            new DCDError(4031, "The bearer token is not an access token")
+          );
+        }
+        return Promise.resolve({
+          entityId: intro.sub,
+          token: token,
+          sub: intro.sub,
+          exp: intro.exp,
+          token_type: intro.token_type,
+        });
+      })
+      .catch((error) => {
+        return Promise.reject(error);
       });
-    } catch (error) {
-      return Promise.reject(error);
-    }
   }
 
-  refreshTokenIfExpired(): Promise<void> {
+  refreshTokenIfExpired(): Promise<string> {
     if (this.token) {
       if (this.token.expired()) {
         return this.requestNewToken();
       }
-      return Promise.resolve();
+      return Promise.resolve(this.token.token.access_token);
     }
+
     return this.requestNewToken();
   }
 
-  async requestNewToken(): Promise<void> {
+  async requestNewToken(): Promise<string> {
     try {
       const result = await this.oauth2.getToken({
         scope: config.oauth2.oAuth2Scope,
       });
       this.token = this.oauth2.createToken(result);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  getBearer(): string {
-    return "bearer " + qs.escape(this.token.token.access_token);
-  }
-
-  /**
-   * Build HTTP request with token and return the result.
-   * @param {String} method
-   * @param {String} url
-   * @param {Object} body (optional)
-   * @param {String} type (default: application/json)
-   * @returns {Promise}
-   */
-  private async authorisedRequest(
-    method: string,
-    url: string,
-    body: Record<string, unknown> = null,
-    type = "application/json"
-  ) {
-    try {
-      // Ensure a valid token before building the request
-      await this.refreshTokenIfExpired();
-      const options: RequestInit = {
-        headers: {
-          Authorization: this.getBearer(),
-          "Content-Type": type,
-          Accept: "application/json",
-        },
-        method: method,
-        timeout: 15000,
-      };
-      if (config.http.secured) {
-        options.headers["X-Forwarded-Proto"] = "https";
-      }
-      if (body !== null) {
-        let bodyStr = "";
-        if (type === "application/x-www-form-urlencoded") {
-          bodyStr = qs.stringify(body as qs.ParsedUrlQueryInput);
-        } else {
-          bodyStr = JSON.stringify(body);
-        }
-        options.headers["Content-Length"] = bodyStr.length;
-        options.body = bodyStr;
-      }
-      const result = await fetch(url, options);
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(new DCDError(result.status, result.statusText));
+      return Promise.resolve(this.token.token.access_token);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -225,29 +161,15 @@ export class AuthService {
    * @param {string} personId
    * returns {Person}
    **/
-  async listAPersonApps(personId: string) {
-    const url =
-      config.oauth2.oAuth2HydraAdminURL +
-      "/oauth2/auth/sessions/consent?subject=" +
-      personId;
-    const res = await fetch(url, { headers: { "X-Forwarded-Proto": "https" } });
-    if (res.status < 200 || res.status > 302) {
-      // This will handle any errors that aren't network related
-      // (network related errors are handled automatically)
-      const error = await res.json();
-      Log.error(
-        "An error occurred while making a HTTP request: " +
-          JSON.stringify(error)
-      );
-      return Promise.reject(new Error(error.error.message));
-    }
-    const result = await res.json();
-    for (let i = 0; i < result.length; i++) {
-      result[i].consent_request.requested_scope = this.buildDetailedScopes(
-        result[i].consent_request.requested_scope
-      );
-    }
-    return Promise.resolve(result);
+  async listAPersonApps(personId: string): Promise<PreviousConsentSession[]> {
+    return this.hydraAdmin
+      .listSubjectConsentSessions(personId, { headers: this.headers })
+      .then((response) => {
+        return Promise.resolve(response.data);
+      })
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -255,27 +177,17 @@ export class AuthService {
    * @param {string} personId
    * returns {Person}
    **/
-  async deleteAPersonApp(personId: string, clientId: string) {
-    const url =
-      config.oauth2.oAuth2HydraAdminURL +
-      "/oauth2/auth/sessions/consent?subject=" +
-      personId +
-      "&client=" +
-      clientId;
-    const res = await fetch(url, {
-      headers: { "X-Forwarded-Proto": "https" },
-      method: "DELETE",
-    });
-    if (res.status < 200 || res.status > 302) {
-      // This will handle any errors that aren't network related
-      // (network related errors are handled automatically)
-      const error = await res.json();
-      Log.error(
-        "An error occurred while making a HTTP request: " +
-          JSON.stringify(error)
-      );
-      return new Error(error.error.message);
-    }
+  async deleteAPersonApp(personId: string, clientId: string): Promise<void> {
+    this.hydraAdmin
+      .revokeConsentSessions(personId, clientId, true, {
+        headers: this.headers,
+      })
+      .then(() => {
+        return Promise.resolve();
+      })
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   buildDetailedScopes(scopes: string[]): Scope[] {
