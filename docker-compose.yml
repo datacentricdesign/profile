@@ -42,6 +42,7 @@ services:
       - OAUTH2_FIRST_PARTY_APPS=$OAUTH2_FIRST_PARTY_APPS
 
       - ACP_URL=$ACP_URL
+    restart: on-failure
 
   profile-ui:
     build:
@@ -54,6 +55,7 @@ services:
     environment:
      - NGINX_HOST=dwd.tudelft.nl
      - NGINX_PORT=8081
+    restart: on-failure
 
   profile-postgres:
     image: postgres:9.6
@@ -67,6 +69,7 @@ services:
       - $HOST_DATA_FOLDER/profile/profile-postgres:/var/lib/postgresql/data
     # ports:
     #   - $PROFILE_POSTGRES_PORT:$PROFILE_POSTGRES_PORT
+    restart: on-failure
 
 networks: 
     default:
