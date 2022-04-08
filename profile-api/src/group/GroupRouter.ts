@@ -54,9 +54,9 @@ export class GroupRouter {
     );
 
     /**
-     * @api {delete} /groups Delete
+     * @api {delete} /groups/:groupId Delete
      * @apiGroup Group
-     * @apiDescription Create a group
+     * @apiDescription Delete a group
      * @apiVersion 0.1.2
      **/
     this.router.delete(

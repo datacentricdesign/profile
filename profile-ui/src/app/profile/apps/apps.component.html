@@ -1,0 +1,171 @@
+<div *ngIf="apps$ | async as apps else noData">
+    <h1>
+        Apps
+    </h1>
+    <h2>
+        List of apps which can access part of your data.
+    </h2>
+    <div class="row" *ngFor="let client of clients; let iClient = index">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <span *ngIf="client.logo_uri !== ''">
+                        <img src="{{client.logo_uri}}" style="max-width: 50px;float: left;" />
+                    </span>
+                    <h4 class="card-title">
+                        <a href="{{client.client_uri}}" target="_blank">
+                            {{client.client_name}}
+                        </a>
+                    </h4>
+                    <p>
+                        Owned by {{client.owner}}
+                    </p>
+                    <a *ngIf="client.policy_uri!==''" href="{{client.policy_uri}}"
+                        target="_blank">Policy</a>&nbsp;/&nbsp;
+                    <a *ngIf="client.tos_uri!==''" href="{{client.tos_uri}}" target="_blank">Terms of
+                        Service</a>&nbsp;/&nbsp;
+                    <a *ngIf="client.contacts!==''" href="mailto:{{client.contacts[0]}}" target="_blank">Contact</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div *ngIf="client.requested_scope !== undefined"
+                                style="border: 1px #AAA solid; border-radius: 6px; padding: 10px;max-width:200px;margin:10px auto">
+                                <div *ngFor="let scope of client.requested_scope">
+                                    <input type="checkbox" id={{scope}} value={{scope.id}} name="grant_scope"
+                                        checked="checked" disabled="true">
+                                    <label for="{{scope.name}}" style="padding-left:5px">{{scope.name}}</label>
+                                    <span class="description">
+                                        <i class="nc-icon nc-alert-circle-i tooltipinfo">
+                                            <span class="tooltipinfotext">{{scope.desc}}</span>
+                                        </i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <p>
+                                Here you can revoke your access consent to <b>{{client.client_name}}</b>. This will not
+                                impact your
+                                Data-Centric Design data. However, functionalities of {{client.client_name}} might not
+                                function
+                                properperly where your data is needed.
+                            </p>
+                            <button (click)="revoke(client.client_id)" class="btn btn-danger">Revoke</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>App Management</h2>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form (ngSubmit)="createApp()" #propertyForm="ngForm">
+            <div class="card">
+                <div class="card-header">
+                    Create an App
+                    <p>
+                        An App represents a web, mobile or native application (OAuth2 client) which let users
+                        interact with DCD Lab resources.
+                    </p>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" required [(ngModel)]="model.name" name="name"
+                            #name="ngModel">
+                        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">Name is required</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Description</label>
+                        <input type="text" class="form-control" id="description" required
+                            [(ngModel)]="model.description" name="description" #description="ngModel">
+                        <div [hidden]="description.valid || description.pristine" class="alert alert-danger">
+                            Description is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="uri">URI of your </label>
+                        <input type="text" class="form-control" id="uri" required [(ngModel)]="model.uri"
+                        placeholder="https://mydomain.com/myapp" name="uri" #uri="ngModel">
+                        <div [hidden]="uri.valid || uri.pristine" class="alert alert-danger">URI is required</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <hr />
+                    <button type="submit" style="margin-left: 10px;margin-top: 7px;" class="btn btn-success">
+                        Create a New App
+                    </button>
+                </div>
+            </form>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12" *ngFor="let group of groups">
+            <div class="card" *ngIf="group.isAdmin">
+                <div class="card-header">
+                    <h3>{{group.id}}</h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group" style="display:inline-block">
+                    </div>
+                    <div class="input-group">
+                        <label for="newMemberId-{{group.id}}"></label>
+                        <input type="text" class="form-control" id="nameNewMemberInGroup-{{group.id}}" required
+                            name="nameNewMemberId-{{group.id}}">
+                        <div class="input-group-append">
+                            <select class="input-group-text" class="form-control" id="typeNewMemberInGroup-{{group.id}}">
+                                <option value="dcd:persons" selected="selected">Person</option>
+                                <option value="dcd:groups">Group</option>
+                                <option value="dcd:things">Thing</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button style="margin-left: 10px;margin-top: 7px;" type="button" (click)="addMember($event)"
+                        id="newMemberInGroup-{{group.id}}" class="btn btn-info">
+                        Add to {{group.id}}
+                    </button>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class=" text-primary">
+                                <th style="max-width:200px">
+                                    Subject
+                                </th>
+                                <th>
+
+                                </th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let member of group.members; let iMember = index">
+                                    <td>
+                                        {{member}}
+                                    </td>
+                                    <td style="max-width:60px">
+                                        <button id="removeMember-{{member}}-FromGroup-{{group.id}}" type="button"
+                                            (click)="removeMember($event)" class="btn btn-warning">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" (click)="deleteGroup($event)" id="deleteGroup-{{group.id}}"
+                        class="btn btn-danger">
+                        Delete group
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #noData>Loading apps...</ng-template>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { PersonService } from '../services/person.service';
+import { App, PersonService } from '../services/person.service';
 import { ActivatedRoute } from '@angular/router';
 import { AppService } from 'app/app.service';
 import { Observable, throwError } from 'rxjs';
@@ -14,11 +14,11 @@ declare interface TableData {
 }
 
 @Component({
-  selector: 'app-person-app',
-  templateUrl: './person-app.component.html',
-  styleUrls: ['./person-app.component.css']
+  selector: 'app-apps',
+  templateUrl: './apps.component.html',
+  styleUrls: ['./apps.component.css']
 })
-export class PersonAppComponent implements OnInit {
+export class AppsComponent implements OnInit {
 
 
   private apiURL: string
@@ -31,6 +31,13 @@ export class PersonAppComponent implements OnInit {
 
   personId: string
   clients: any = []
+
+  model: App = {
+    name: 'My Test App',
+    description: 'An App to test!',
+    uri: '',
+    personId: undefined
+  }
 
   constructor(
     private oauthService: OAuthService, private personService: PersonService, private _Activatedroute: ActivatedRoute, private appService: AppService,
@@ -66,9 +73,18 @@ export class PersonAppComponent implements OnInit {
           })
         )
       }
-
-
     });
+  }
+
+  onSubmit() {
+    this.model.personId = this.personId;
+    this.personService.createAnApp(this.model)
+      .then((data: App) => {
+        window.location.href = './apps/' + data.id;
+      })
+      .catch((error) => {
+        this.personService.toast(error)
+      })
   }
 
   revoke(clientId:string) {

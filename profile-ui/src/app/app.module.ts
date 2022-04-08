@@ -26,7 +26,7 @@ import { AppService } from './app.service';
 import { ProfileComponent } from './profile/profile.component'
 import { BrowserModule } from '@angular/platform-browser'
 import { SharedModule } from './shared/shared.module';
-import { PersonAppComponent } from './profile/person-app/person-app.component'
+import { AppsComponent } from './profile/apps/apps.component'
 import { GroupsComponent } from './profile/groups/groups.component'
 
 export function init_app(appService: AppService) {
@@ -43,7 +43,7 @@ export function init_app(appService: AppService) {
     ConsentPageComponent,
     ErrorPageComponent,
     ProfileComponent,
-    PersonAppComponent,
+    AppsComponent,
     GroupsComponent
   ],
   imports: [
