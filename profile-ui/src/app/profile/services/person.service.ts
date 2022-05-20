@@ -58,7 +58,7 @@ export class PersonService {
     this.http.patch(url, body, { headers })
       .subscribe(
         result => {
-          window.location.reload(true);
+          window.location.reload();
         },
         err => {
           console.warn('status', err.status);
@@ -90,7 +90,7 @@ export class PersonService {
     this.http.delete(url, { headers: headers })
       .subscribe(
         result => {
-          window.location.reload(true)
+          window.location.reload()
         },
         err => {
           console.warn('status', err.status);

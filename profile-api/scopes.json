@@ -41,22 +41,22 @@
   },
   "profile": {
     "id": "profile",
-    "name": "Profile",
+    "name": "Access my profile information and preferences",
     "desc": "Access my profile information and preferences. If available: my name, picture or avatar, website, gender, date of birth, timezone and locale preferences."
   },
   "email": {
     "id": "email",
-    "name": "Email",
+    "name": "Access my Email Address",
     "desc": "Access my email address and its verification status."
   },
   "phone": {
     "id": "phone",
-    "name": "Phone",
+    "name": "Access my Phone number",
     "desc": "Access my phone number and its verification status."
   },
   "address": {
     "id": "address",
-    "name": "Address",
+    "name": "Address my Address information",
     "desc": "Access my address information."
   }
 }
