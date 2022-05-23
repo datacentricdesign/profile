@@ -11,6 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "baseHref": "http://localhost:4200/profile/",
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -25,17 +26,17 @@
               "src/assets/scss/paper-dashboard.scss",
               "node_modules/ngx-toastr/toastr.css"
             ],
+            "allowedCommonJsDependencies": [
+              "file-saver"
+            ],
             "scripts": []
           },
           "configurations": {
-            "development": {
-
-            },
             "production": {
+              "baseHref": "https://dwd.tudelft.nl/profile",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -45,18 +46,6 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/assets/config.json",
-                  "with": "src/assets/prod.config.json"
-                }
-              ]
-            },
-            "test": {
-              "fileReplacements": [
-                {
-                  "replace": "src/assets/config.json",
-                  "with": "src/assets/test.config.json"
                 }
               ]
             }
@@ -107,14 +96,9 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "eslintConfig": ".eslintrc.js",
-            "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "**/*.spec.ts",
+              "**/*.ts"
             ]
           }
         }

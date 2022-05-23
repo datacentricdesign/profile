@@ -41,20 +41,16 @@ export class PersonAppComponent implements OnInit {
   ngOnInit(): void {
     this._Activatedroute.paramMap.subscribe(params => {
       if (this.oauthService.hasValidAccessToken() && this.oauthService.hasValidIdToken()) {
-        console.log('## valid token')
         const claim: any = this.oauthService.getIdentityClaims()
         this.personId = claim.sub
         let headers = new HttpHeaders().set('Accept', 'application/json')
           .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
         const url = this.apiURL + "/persons/" + claim.sub + '/apps'
-        console.log(url)
         this.apps$ = this.http.get<any>(url, { headers }).pipe(
           map((data: any) => {
-            console.log(data)
             this.apps = data
             const clients:object = {}
             for (let i=0;i<this.apps.length;i++) {
-              console.log(this.apps[i])
               const clientId = this.apps[i].consent_request.client.client_id
               if (clients[clientId]===undefined) {
                 clients[clientId] = this.apps[i].consent_request.client

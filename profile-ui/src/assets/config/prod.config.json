@@ -1,0 +1,21 @@
+{
+  "name": "DCD Profile",
+  "version": "0.1.5",
+  "environment": "production",
+  "basehref": "/profile",
+  "apiURL": "https://dwd.tudelft.nl/bucket/api",
+  "grafanaURL": "https://dwd.tudelft.nl/grafana",
+  "authCodeFlow": {
+    "issuer": "https://dwd.tudelft.nl:443/",
+    "redirectUri": "https://dwd.tudelft.nl:443/profile",
+    "postLogoutRedirectUri": "https://dwd.tudelft.nl:443/profile",
+    "clientId": "clients:profile-ui",
+    "responseType": "code",
+    "scope": "openid profile email offline dcd:persons",
+    "useSilentRefresh": false,
+    "showDebugInformation": true,
+    "sessionChecksEnabled": false,
+    "timeoutFactor": 0.01,
+    "clearHashAfterLogin": false
+  }
+}

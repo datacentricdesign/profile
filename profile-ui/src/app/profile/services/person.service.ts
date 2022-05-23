@@ -19,7 +19,6 @@ export class PersonService {
     private http: HttpClient,
     private appService: AppService
   ) {
-    console.log('constructor thing service')
     this.apiURL = appService.settings.apiURL;
   }
 
@@ -52,7 +51,6 @@ export class PersonService {
     if (fields.email !== undefined && fields.email !== '') {
       body.email = fields.email;
     }
-    console.log(body)
     const headers = new HttpHeaders().set('Accept', 'application/json')
     .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
     this.http.patch(url, body, { headers })
@@ -108,8 +106,6 @@ export class PersonService {
     
     const headers = new HttpHeaders().set('Accept', 'application/json')
     .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
-    console.log("list group")
-    console.log(headers)
     return this.http.get<any>(url, { headers }).pipe(
       map((data: any) => {
         return data;
@@ -130,7 +126,6 @@ export class PersonService {
   createAGroup(groupId: string, members: string[]) {
     const url = this.apiURL + '/groups';
     const body = { id: groupId, members: members }
-    console.log(body)
 
     const headers = new HttpHeaders().set('Accept', 'application/json')
     .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
@@ -157,15 +152,11 @@ export class PersonService {
     const body = { members: newMemberIds }
     const headers = new HttpHeaders().set('Accept', 'application/json')
     .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
-    console.log('hello')
-    console.log(headers)
-    console.log(this.oauthService.getAccessToken())
     return this.http.post(url, body, { headers: headers }).toPromise()
   }
 
   removeAMemberFromAGroup(groupId: string, personId: string) {
     const url = this.apiURL + '/groups/' + groupId + '/members/' + personId;
-    console.log(url)
     const headers = new HttpHeaders().set('Accept', 'application/json')
     .set('Authorization', 'Bearer ' + this.oauthService.getAccessToken());
     return this.http.delete(url, { headers: headers }).toPromise()

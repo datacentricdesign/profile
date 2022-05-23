@@ -32,14 +32,13 @@ export class AppComponent {
     this.oauthService.configure(this.appService.settings.authCodeFlow);
     this.oauthService.requestAccessToken = true;
 
-    console.log("app component")
     if (
       this.oauthService.hasValidAccessToken() &&
       this.oauthService.hasValidIdToken()
     ) {
-      console.log("=> yes")
+      // authenticated
     } else {
-      console.log("=> no")
+      // no authenticated
     }
 
 

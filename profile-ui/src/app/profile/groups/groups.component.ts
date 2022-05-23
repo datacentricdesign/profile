@@ -39,9 +39,9 @@ export class GroupsComponent implements OnInit {
         this.toast('This group id is already in use.', 'danger')
       }).catch(error => {
         this.personService.createAGroup(groupId, this.groupModel.members).then(result => {
-          window.location.reload(true)
+          window.location.reload()
         }).catch(error => {
-          console.log(error)
+          console.error(error)
         })
       })
     }
@@ -50,9 +50,9 @@ export class GroupsComponent implements OnInit {
   deleteGroup(event) {
     const groupId = event.target.id.replace('deleteGroup-', '')
     this.personService.deleteAGroup(groupId).then(result => {
-      window.location.reload(true)
+      window.location.reload()
     }).catch(error => {
-      console.log(error)
+      console.error(error)
     })
   }
 
@@ -61,15 +61,14 @@ export class GroupsComponent implements OnInit {
     const typeSubject = (document.getElementById('typeNewMemberInGroup-' + groupId) as HTMLInputElement).value
     const subjectId = (document.getElementById('nameNewMemberInGroup-' + groupId) as HTMLInputElement).value
     if (subjectId !== '') {
-      console.log(subjectId)
       let subject = subjectId
       if (!subject.startsWith('dcd:')) {
         subject = typeSubject + ':' + subject
       }
       this.personService.addMembersToAGroup(groupId, [subject]).then(result => {
-        window.location.reload(true)
+        window.location.reload()
       }).catch(error => {
-        console.log(error)
+        console.error(error)
       })
     }
   }
@@ -79,9 +78,9 @@ export class GroupsComponent implements OnInit {
     const groupId = idArray[1]
     const personId = idArray[0]
     this.personService.removeAMemberFromAGroup(groupId, personId).then(result => {
-      window.location.reload(true)
+      window.location.reload()
     }).catch(error => {
-      console.log(error)
+      console.error(error)
     })
   }
 
