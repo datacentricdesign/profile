@@ -4,7 +4,7 @@
   "environment": "production",
   "basehref": "/profile",
   "apiURL": "https://dwd.tudelft.nl/bucket/api",
-  "grafanaURL": "https://dwd.tudelft.nl/grafana",
+  "kratosURL": "http://localhost:4433",
   "authCodeFlow": {
     "issuer": "https://dwd.tudelft.nl:443/",
     "redirectUri": "https://dwd.tudelft.nl:443/profile",

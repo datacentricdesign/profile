@@ -4,6 +4,7 @@
   "environment": "development",
   "basehref": "/profile",
   "apiURL": "https://dwd.tudelft.nl/profile/api",
+  "kratosURL": "http://localhost:4433",
   "authCodeFlow": {
     "issuer": "https://dwd.tudelft.nl:443/",
     "redirectUri": "http://localhost:4200/profile",
