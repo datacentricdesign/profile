@@ -17,8 +17,8 @@ import { MatDialogModule } from "@angular/material/dialog"
 
 import { FormsModule }   from '@angular/forms';
 import { LandingPageComponent } from './pages/landing-page/landing-page.component';
-import { SignInPageComponent } from './pages/sign-in-page/sign-in-page.component';
-import { SignUpPageComponent } from './pages/sign-up-page/sign-up-page.component';
+import { SignInPageComponent } from './pages/sign-in/sign-in.component';
+import { SignUpPageComponent } from './pages/sign-up/sign-up.component';
 import { SignOutPageComponent } from './pages/sign-out-page/sign-out-page.component';
 import { ConsentPageComponent } from './pages/consent-page/consent-page.component';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';

@@ -1,11 +1,11 @@
 <div class="wrapper">
     <div class="main-panel" style="width: 100%;">
         <div class="content" style="min-height:calc(100vh - 165px);;">
-            <form (ngSubmit)="postSignIn()" #signInForm="ngForm" *ngIf="auth$ | async as data else noData">
+            <form (ngSubmit)="postSignIn()" #signInForm="ngForm" *ngIf="ready">
                 <div class="card card-stats" style="max-width: 500px;margin:auto">
                     <div class="card-header" style="text-align:center;">
-                        <span *ngIf="data.client.client_id!='clients:profile-ui' && data.client.logo_uri !== ''">
-                            <img src="{{data.client.logo_uri}}" style="max-width: 150px;" />
+                        <span *ngIf="client !== undefined && client.client_id!='clients:profile-ui' && client.logo_uri !== ''">
+                            <img src="{{client.logo_uri}}" style="max-width: 150px;" />
                             <i class="nc-icon nc-simple-add"></i>
                         </span>
                         <img src="./assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
@@ -15,16 +15,15 @@
                         <p *ngIf="client !== undefined && client.client_id=='clients:profile-ui'">
                             Sign in to your <br>Data-Centric Design Lab Account.
                         </p>
-                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{client.policy_uri}}" target="_blank">Policy</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}" target="_blank">Terms of Service</a>&nbsp;/&nbsp;
-                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{client.contacts[0]}}" target="_blank">Contact</a>
+                        <a *ngIf="client!==undefined && client.policy_uri!==''" href="{{client.policy_uri}}" target="_blank">Policy</a>
+                        <a *ngIf="client!==undefined && client.tos_uri!==''" href="{{client.tos_uri}}" target="_blank">&nbsp;/&nbsp;Terms of Service</a>
+                        <a *ngIf="client!==undefined && client.contacts!==''" href="mailto:{{client.contacts[0]}}" target="_blank">&nbsp;/&nbsp;Contact</a>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-8 col-md-8">
                                 <input type="hidden" name="_csrf" value={{csrf}}>
                                 <input type="hidden" name="challenge" value={{login_challenge}}>
-                                            
                                 <div class="form-group">
                                 <label for="email">Username or Email address</label>
                                 <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email" placeholder="" #email="ngModel">

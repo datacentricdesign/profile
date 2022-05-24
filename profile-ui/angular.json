@@ -11,7 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "baseHref": "http://localhost:4200/profile/",
+            "baseHref": "http://localhost/profile/",
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -27,7 +27,8 @@
               "node_modules/ngx-toastr/toastr.css"
             ],
             "allowedCommonJsDependencies": [
-              "file-saver"
+              "file-saver",
+              "@ory/kratos-client"
             ],
             "scripts": []
           },
@@ -54,7 +55,9 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "profile-angularcli:build"
+            "browserTarget": "profile-angularcli:build",
+            "host": "0.0.0.0",
+            "port": 80
           },
           "configurations": {
             "production": {
