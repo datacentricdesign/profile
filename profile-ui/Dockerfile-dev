@@ -1,0 +1,9 @@
+FROM node:current-buster
+# Create app directory
+WORKDIR /usr/app
+# Install ONLY prod dependencies
+COPY package*.json ./
+# RUN npm install --production
+RUN npm install
+# Run the dev script
+CMD npm run start
