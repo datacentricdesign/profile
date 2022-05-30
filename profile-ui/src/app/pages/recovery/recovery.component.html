@@ -1,0 +1,29 @@
+<div class="wrapper">
+    <div class="main-panel" style="width: 100%;">
+        <div class="content" style="min-height:calc(100vh - 165px);;">
+            <form (ngSubmit)="postRecovery()" #recoveryForm="ngForm" *ngIf="ready">
+                <div class="card card-stats" style="max-width: 500px;margin:auto">
+
+                    <div class="card-header" style="text-align:center;">
+                        Recovery
+                    </div>
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" class="form-control" id="email" required [(ngModel)]="model.email" name="email" placeholder="" #email="ngModel">
+                            <div [hidden]="email.valid || email.pristine" class="alert alert-danger">
+                                Your email is required</div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer ">
+                        <hr>
+                        <input type="submit" id="submit" name="submit" value="Submit" class="btn btn-success" [disabled]="!recoveryForm.form.valid">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <footer-cmp></footer-cmp>
+    </div>
+</div>

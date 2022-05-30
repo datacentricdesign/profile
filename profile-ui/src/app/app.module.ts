@@ -17,10 +17,10 @@ import { MatDialogModule } from "@angular/material/dialog"
 
 import { FormsModule }   from '@angular/forms';
 import { LandingPageComponent } from './pages/landing-page/landing-page.component';
-import { SignInPageComponent } from './pages/sign-in/sign-in.component';
-import { SignUpPageComponent } from './pages/sign-up/sign-up.component';
-import { SignOutPageComponent } from './pages/sign-out-page/sign-out-page.component';
-import { ConsentPageComponent } from './pages/consent-page/consent-page.component';
+import { SignInComponent } from './pages/sign-in/sign-in.component';
+import { SignUpComponent } from './pages/sign-up/sign-up.component';
+import { SignOutComponent } from './pages/sign-out/sign-out.component';
+import { ConsentComponent } from './pages/consent-page/consent.component';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
 import { AppService } from './app.service';
 import { ProfileComponent } from './profile/profile.component'
@@ -28,6 +28,9 @@ import { BrowserModule } from '@angular/platform-browser'
 import { SharedModule } from './shared/shared.module';
 import { PersonAppComponent } from './profile/person-app/person-app.component'
 import { GroupsComponent } from './profile/groups/groups.component'
+import { VerificationComponent } from "./pages/verification/verification.component"
+import { RecoveryComponent } from "./pages/recovery/recovery.component"
+import { SettingsComponent } from "./pages/settings/settings.component"
 
 export function init_app(appService: AppService) {
   return () => appService.load();
@@ -37,14 +40,17 @@ export function init_app(appService: AppService) {
   declarations: [
     AppComponent,
     LandingPageComponent,
-    SignInPageComponent,
-    SignUpPageComponent,
-    SignOutPageComponent,
-    ConsentPageComponent,
+    SignInComponent,
+    SignUpComponent,
+    SignOutComponent,
+    ConsentComponent,
     ErrorPageComponent,
     ProfileComponent,
     PersonAppComponent,
-    GroupsComponent
+    GroupsComponent,
+    VerificationComponent,
+    RecoveryComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

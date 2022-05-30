@@ -7,13 +7,12 @@ import { AppService } from 'app/app.service';
 import { AxiosResponse } from 'axios'
 
 import { V0alpha2Api, SelfServiceLoginFlow } from '@ory/kratos-client'
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html'
 })
-export class SignInPageComponent implements OnInit {
+export class SignInComponent implements OnInit {
 
   auth$: Observable<any>;
 
@@ -34,6 +33,10 @@ export class SignInPageComponent implements OnInit {
   action: string
   message: string
   cookie: string
+  error: any
+
+  // coming from hydra (OAuth client requesting log in)
+  login_challenge: string
 
   constructor(private route: ActivatedRoute,
     private _router: Router,
@@ -51,7 +54,7 @@ export class SignInPageComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       // coming from hydra
-      // this.login_challenge = params["login_challenge"]
+      this.login_challenge = params["login_challenge"]
       // this.auth$ = this.http.get<any>(this.apiURL + "/auth/signin?login_challenge=" + this.login_challenge).pipe(
       //   map((data: any) => {
       //     this.csrf = data.csrfToken
@@ -63,28 +66,29 @@ export class SignInPageComponent implements OnInit {
       // )
 
 
-      
-      this.kratos = new V0alpha2Api(undefined,'http://localhost')
-      this.kratos.initializeSelfServiceLoginFlowForBrowsers(true, 'aal1', 'http://localhost/profile', {headers: {'Accept': 'application/json'}})
-          .then( (data: AxiosResponse<SelfServiceLoginFlow>) => {
-            // console.log(data.headers['set-cookie'])
-            this.flowId = data.data.id;
-            this.csrf = data.data.ui.nodes[0].attributes['value'];
-            this.ready = true
-            this.action = data.data.ui.action
-            this.data = data.data
-            this.message = data.data.ui.messages[0].text
-            console.log(data)
-          })
-          .catch( (error) => {
-            console.error(error)
-          })
+      this.kratos = new V0alpha2Api(undefined, 'http://localhost')
+      const refresh = false;
+      this.kratos.initializeSelfServiceLoginFlowForBrowsers(refresh, 'aal1', 'http://localhost/profile', { headers: { 'Accept': 'application/json' } })
+        .then((data: AxiosResponse<SelfServiceLoginFlow>) => {
+          this.flowId = data.data.id;
+          this.csrf = data.data.ui.nodes[0].attributes['value'];
+          this.action = data.data.ui.action
+          // this.message = data.data.ui.messages[0].text
+          this.ready = true
+        })
+        .catch((error) => {
+          if (error.response.data.error.id === "session_already_available") {
+            window.location = "./settings" as any
+          } else {
+            console.log(error.response)
+          }
+        })
     });
 
   }
 
   postSignIn(): void {
-    
+
     // Check whether we deal with an email or a username, and make sure username start with person prefix
     let emailOrUsername = this.model.email
     // if (!emailOrUsername.includes('@') && !emailOrUsername.startsWith('dcd:persons:')) {
@@ -110,8 +114,14 @@ export class SignInPageComponent implements OnInit {
     // });
 
 
-    const httpOptions = { credentials: 'include', headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}}
+    const httpOptions = { credentials: 'include', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' } }
     this.kratos.submitSelfServiceLoginFlow(this.flowId, undefined, body, httpOptions)
+      .then(() => {
+        window.location = "./settings" as any
+      })
+      .catch((error) => {
+        this.error = error
+      })
   }
 
 }

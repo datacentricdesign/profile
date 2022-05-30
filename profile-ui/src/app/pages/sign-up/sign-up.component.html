@@ -73,10 +73,18 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="name">Name</label>
-                                    <input type="text" class="form-control" id="name" required [(ngModel)]="model.name"
-                                        name="name" placeholder="John Doe" #name="ngModel">
-                                    <div [hidden]="name.valid || name.pristine" class="alert alert-danger">A name is
+                                    <label for="first">First Name</label>
+                                    <input type="text" class="form-control" id="first" required [(ngModel)]="model.first"
+                                        name="first" placeholder="John" #first="ngModel">
+                                    <div [hidden]="first.valid || first.pristine" class="alert alert-danger">A first name is
+                                        required</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="last">Last Name</label>
+                                    <input type="text" class="form-control" id="last" required [(ngModel)]="model.last"
+                                        name="last" placeholder="John Doe" #last="ngModel">
+                                    <div [hidden]="last.valid || last.pristine" class="alert alert-danger">A last name is
                                         required</div>
                                 </div>
 
@@ -121,7 +129,7 @@
                         <input type="submit" id="submit" name="submit" value="Sign up" class="btn btn-info"
                             [disabled]="!signUpForm.form.valid">
                         <span style="float: right;text-align:right;padding-top: 5px;">
-                            Already a DCD Lab member? <a href="./signin?login_challenge={{login_challenge}}">Sign in</a>
+                            Already a DCD Lab member? <a href="./signin">Sign in</a>
                         </span>
                     </div>
                 </div>

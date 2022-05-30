@@ -1,22 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { DTOPerson } from '@datacentricdesign/types'
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
 import { AppService } from 'app/app.service';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+
 import { ToastrService } from 'ngx-toastr';
 
 
-import { V0alpha2Api, SelfServiceRegistrationFlow } from '@ory/kratos-client'
+import { V0alpha2Api, SelfServiceRegistrationFlow, Session } from '@ory/kratos-client'
 import { AxiosResponse } from 'axios'
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html'
 })
-export class SignUpPageComponent implements OnInit {
+export class SignUpComponent implements OnInit {
 
   auth$: Observable<any>;
 
@@ -37,18 +36,20 @@ export class SignUpPageComponent implements OnInit {
   action: string
   message: string
   cookie: string
+  error: any
 
   constructor(private route: ActivatedRoute,
     private http: HttpClient,
     private appService: AppService,
     private toastr: ToastrService) {
-      // this.apiURL = this.appService.settings.apiURL;
+    // this.apiURL = this.appService.settings.apiURL;
   }
 
   model: any = {
     email: '',
     password: '',
-    name: '',
+    first: '',
+    last: '',
     username: '',
     confirmPassword: ''
   }
@@ -67,20 +68,27 @@ export class SignUpPageComponent implements OnInit {
       //     return throwError(error);
       //   })
       // )
-      this.kratos = new V0alpha2Api(undefined,'http://localhost')
-      this.kratos.initializeSelfServiceRegistrationFlowForBrowsers('http://localhost/profile', {headers: {'Accept': 'application/json'}})
-          .then( (data: AxiosResponse<SelfServiceRegistrationFlow>) => {
-            this.flowId = data.data.id;
+      this.kratos = new V0alpha2Api(undefined, 'http://localhost')
+      this.kratos.initializeSelfServiceRegistrationFlowForBrowsers('http://localhost/profile', { headers: { 'Accept': 'application/json' } })
+        .then((data: AxiosResponse<SelfServiceRegistrationFlow>) => {
+          this.flowId = data.data.id;
+          if (data.data.ui.nodes.length > 0) {
             this.csrf = data.data.ui.nodes[0].attributes['value'];
-            this.ready = true
-            this.action = data.data.ui.action
-            this.data = data.data
+          }
+          this.ready = true
+          this.action = data.data.ui.action
+          this.data = data.data
+          if (data.data.ui.messages !== undefined && data.data.ui.messages.length > 0) {
             this.message = data.data.ui.messages[0].text
-            console.log(data)
-          })
-          .catch( (error) => {
-            console.error(error)
-          })
+          }
+        })
+        .catch((error) => {
+          if (error.response.data.error.id === "session_already_available") {
+            window.location = "./settings" as any
+          } else {
+            console.log(error.response)
+          }
+        })
     });
   }
 
@@ -109,28 +117,34 @@ export class SignUpPageComponent implements OnInit {
       traits: {
         email: this.model.email,
         name: {
-          first: this.model.name,
-          last: this.model.name
+          first: this.model.first,
+          last: this.model.last
         }
       }
     }
 
-    const httpOptions = { credentials: 'include', headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}}
+    const httpOptions = { credentials: 'include', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' } }
     this.kratos.submitSelfServiceRegistrationFlow(this.flowId, body, httpOptions)
+      .then(() => {
+        window.location = "./settings" as any
+      })
+      .catch((error) => {
+        this.error = error
+      })
   }
 
-  toast(message:string, type:string, icon:string = 'nc-alert-circle-i') {
+  toast(message: string, type: string, icon: string = 'nc-alert-circle-i') {
     this.toastr.info(
-      '<span data-notify="icon" class="nc-icon '+icon+'"></span><span data-notify="message">'+message+'</span>',
-        "",
-        {
-          timeOut: 4000,
-          closeButton: true,
-          enableHtml: true,
-          toastClass: "alert alert-"+type+" alert-with-icon",
-          positionClass: "toast-top-center"
-        }
-      );
+      '<span data-notify="icon" class="nc-icon ' + icon + '"></span><span data-notify="message">' + message + '</span>',
+      "",
+      {
+        timeOut: 4000,
+        closeButton: true,
+        enableHtml: true,
+        toastClass: "alert alert-" + type + " alert-with-icon",
+        positionClass: "toast-top-center"
+      }
+    );
   }
 
   toggleFieldTextPasswordType() {

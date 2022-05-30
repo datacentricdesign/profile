@@ -2,60 +2,77 @@ version: '3.7'
 services:
 
   kratos-migrate:
-    image: oryd/kratos:v0.9.0-alpha.2
+    image: $ORY_KRATOS_TAG
     environment:
-      - DSN=postgres://kratos:secret@kratos-postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+      - DSN=postgres://$ORY_POSTGRES_USER:$ORY_POSTGRES_PASSWORD@ory-postgresd:5432/$ORY_POSTGRES_DB?sslmode=disable&max_conns=20&max_idle_conns=4
     volumes:
       - type: bind
-        source: ./config
+        source: ./config/kratos
         target: /etc/config/kratos
-    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    command: migrate -c /etc/config/kratos/kratos.yml sql -e --yes
     restart: on-failure
     networks:
       - dcd-net
-  kratos-selfservice-ui-node:
-    image: oryd/kratos-selfservice-ui-node:v0.9.0-alpha.2
-    environment:
-      - KRATOS_PUBLIC_URL=http://kratos:4433/
-      - KRATOS_BROWSER_URL=http://localhost
-    ports:
-      - '4455:3000'
-    restart: on-failure
-    networks:
-      - dcd-net
+
   kratos:
     depends_on:
       - kratos-migrate
-    image: oryd/kratos:v0.9.0-alpha.2
-    ports:
+    image: $ORY_KRATOS_TAG
+    # ports:
       # - '4433:4433' # public
-      - '4434:4434' # admin
+      # - '4434:4434' # admin
     restart: unless-stopped
     environment:
-      - DSN=postgres://kratos:secret@kratos-postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+      - DSN=postgres://$ORY_POSTGRES_USER:$ORY_POSTGRES_PASSWORD@ory-postgresd:5432/$ORY_POSTGRES_DB?sslmode=disable&max_conns=20&max_idle_conns=4
       - LOG_LEVEL=trace
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
     volumes:
       - type: bind
-        source: ./config
+        source: ./config/kratos
         target: /etc/config/kratos
     networks:
       - dcd-net
-  mailslurper:
-    image: oryd/mailslurper:latest-smtps
-    ports:
-      - '4436:4436'
-      - '4437:4437'
+
+  hydra-migrate:
+    image: $ORY_HYDRA_TAG
+    environment:
+      - DSN=postgres://$ORY_POSTGRES_USER:$ORY_POSTGRES_PASSWORD@ory-postgresd:5432/$ORY_POSTGRES_DB?sslmode=disable&max_conns=20&max_idle_conns=4
+    command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+    volumes:
+      - type: bind
+        source: ./config/hydra
+        target: /etc/config/hydra
+    restart: on-failure
     networks:
       - dcd-net
-  kratos-postgresd:
-    image: postgres:9.6
-    ports:
-      - "5432:5432"
+
+  hydra:
+    depends_on:
+      - hydra-migrate
+    image: $ORY_HYDRA_TAG
+    # ports:
+    #   - "4444:4444" # Public port
+    #   - "4445:4445" # Admin port
+    #   - "5555:5555" # Port for hydra token user
+    command: serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http
+    volumes:
+      - type: bind
+        source: ./config/hydra
+        target: /etc/config/hydra
     environment:
-      - POSTGRES_USER=kratos
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=kratos
+      - DSN=postgres://$ORY_POSTGRES_USER:$ORY_POSTGRES_PASSWORD@ory-postgresd:5432/$ORY_POSTGRES_DB?sslmode=disable&max_conns=20&max_idle_conns=4
+    restart: unless-stopped
+    networks:
+      - dcd-net
+
+  ory-postgresd:
+    image: postgres:9.6
+    # ports:
+      # - "5432:5432"
+    environment:
+      - POSTGRES_USER=$ORY_POSTGRES_USER
+      - POSTGRES_PASSWORD=$ORY_POSTGRES_PASSWORD
+      - POSTGRES_DB=$ORY_POSTGRES_DB
     networks:
       - dcd-net
 
@@ -65,7 +82,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./config/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./config/envoy:/etc/envoy
     networks:
       - dcd-net
 
@@ -79,6 +96,64 @@ services:
       - ./e2e:/usr/app/e2e
       - ./angular.json:/usr/app/angular.json
       - ./tsconfig.json:/usr/app/tsconfig.json    
+    networks:
+      - dcd-net
+
+
+# OAuth2 Clients
+
+  hydra-create-bucket-client:
+    image: $ORY_HYDRA_TAG
+    command: clients create --id $BUCKET_CLIENT_ID --secret $BUCKET_CLIENT_SECRET --name "Bucket" --grant-types client_credentials,refresh_token --response-types token,refresh_token --scope $BUCKET_CLIENT_SCOPE
+    depends_on:
+      - hydra
+    environment:
+      HYDRA_URL: $ORY_HYDRA_ADMIN_URL
+      BUCKET_CLIENT_ID: $BUCKET_CLIENT_ID
+      BUCKET_CLIENT_SECRET: $BUCKET_CLIENT_SECRET
+    networks:
+      - dcd-net
+
+  hydra-delete-bucket-client:
+    image: $ORY_HYDRA_TAG
+    command: clients delete $BUCKET_CLIENT_ID
+    depends_on:
+      - hydra
+    environment:
+      HYDRA_URL: $ORY_HYDRA_ADMIN_URL
+    networks:
+      - dcd-net
+
+  hydra-create-dcdlab-client:
+    image: $ORY_HYDRA_TAG
+    command: clients create --id $DCDLAB_CLIENT_ID --name "DCD Lab" --grant-types client_credentials,refresh_token --response-types id_token,token,code --scope $DCDLAB_CLIENT_SCOPE --client-uri http://localhost/bucket --logo-uri $DCDLAB_URL/assets/img/bucket-logo.svg --policy-uri $DCDLAB_URL/privacy --tos-uri $DCDLAB_URL/terms --post-logout-callbacks $DCDLAB_URL --callbacks $DCDLAB_URL --token-endpoint-auth-method none
+    depends_on:
+      - hydra
+    environment:
+      HYDRA_URL: $ORY_HYDRA_ADMIN_URL
+      DCDLAB_CLIENT_ID: $DCDLAB_CLIENT_ID
+      DCDLAB_CLIENT_SCOPE: $DCDLAB_CLIENT_SCOPE
+      DCDLAB_URL: $DCDLAB_URL
+    networks:
+      - dcd-net
+
+  hydra-delete-dcdlab-client:
+    image: $ORY_HYDRA_TAG
+    command: clients delete $DCDLAB_CLIENT_ID
+    depends_on:
+      - hydra
+    environment:
+      HYDRA_URL: $ORY_HYDRA_ADMIN_URL
+    networks:
+      - dcd-net
+
+  hydra-list:
+    image: $ORY_HYDRA_TAG
+    command: clients list --skip-tls-verify
+    depends_on:
+      - hydra
+    environment:
+      HYDRA_URL: $ORY_HYDRA_ADMIN_URL
     networks:
       - dcd-net
 

@@ -1,0 +1,39 @@
+<div class="wrapper">
+    <div class="main-panel" style="width: 100%;">
+        <div class="content" style="min-height:calc(100vh - 165px);;">
+            <form>
+                <div class="card card-stats" style="max-width: 500px;margin:auto">
+                    <div class="card-header" style="text-align:center;">
+                        <img src="./assets/img/dcd-lab-logo.png" style="max-width: 150px;" />
+                        <h1>Sign out</h1>
+                        <p>
+                            Do you wish to sign out?
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8 col-md-8">
+                                <input type="hidden" name="_csrf" value={{csrfToken}}>
+                                <input type="hidden" name="challenge" value={{challenge}}>
+                                <span *ngIf="error !== undefined" class="danger">
+                                    <p *ngIf="error.requirements !== undefined" class="danger">{{error.requirements}}
+                                    </p>
+                                    <p *ngIf="error.hint !== undefined" class="danger">{{error.hint}}</p>
+                                    <p *ngIf="error.message !== undefined" class="danger">{{error.message}}</p>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer" style="text-align: center;">
+                        <hr>
+                        <input type="button" (click)="logout()" id="accept" name="accept" value="Yes"
+                            class="btn btn-success" style="margin-right: 10px;">
+                        <input type="button" (click)="cancel()" id="reject" name="reject" value="No"
+                            class="btn btn-danger">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <footer-cmp></footer-cmp>
+    </div>
+</div>

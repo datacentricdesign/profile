@@ -23,9 +23,31 @@ static_resources:
                 route:
                   cluster: kratos
               - match:
+                  prefix: "/.well-known/"
+                route:
+                  cluster: hydra
+              - match:
+                  prefix: "/connect/"
+                route:
+                  cluster: hydra
+              - match:
+                  prefix: "/oauth2/"
+                route:
+                  cluster: hydra
+              - match:
+                  prefix: "/userinfo"
+                route:
+                  cluster: hydra
+              - match:
                   prefix: "/profile"
                 route:
                   cluster: profile
+                  upgrade_configs:
+                  - upgrade_type: "websocket"
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: app-dcd
                   upgrade_configs:
                   - upgrade_type: "websocket"
           http_filters:
@@ -45,6 +67,18 @@ static_resources:
               socket_address:
                 address: kratos
                 port_value: 4433
+  - name: hydra
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: hydra
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: hydra
+                port_value: 4444
   - name: profile
     type: STRICT_DNS
     lb_policy: ROUND_ROBIN
@@ -56,4 +90,16 @@ static_resources:
             address:
               socket_address:
                 address: profile
+                port_value: 80
+  - name: app-dcd
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: app-dcd
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: app-dcd
                 port_value: 80

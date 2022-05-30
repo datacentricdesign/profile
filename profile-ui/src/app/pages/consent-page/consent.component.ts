@@ -7,11 +7,10 @@ import { FormGroup } from '@angular/forms';
 import { AppService } from 'app/app.service';
 
 @Component({
-  selector: 'app-consent-page',
-  templateUrl: './consent-page.component.html',
-  styleUrls: ['./consent-page.component.css']
+  selector: 'app-consent',
+  templateUrl: './consent.component.html'
 })
-export class ConsentPageComponent implements OnInit {
+export class ConsentComponent implements OnInit {
 
   auth$: Observable<any>;
 

@@ -5,8 +5,7 @@ import { AppService } from './app.service';
 
   @Component({
     selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    templateUrl: './app.component.html'
   })
 export class AppComponent {
 
@@ -42,7 +41,7 @@ export class AppComponent {
     }
 
 
-    this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    // this.oauthService.loadDiscoveryDocumentAndTryLogin();
   }  
 
 }
