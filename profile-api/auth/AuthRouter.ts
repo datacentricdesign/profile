@@ -4,7 +4,7 @@ import AuthController from "./AuthController";
 
 // Sets up csrf protection
 import * as csrf from "csurf"
-this.csrfProtection = csrf({ cookie: false });
+const csrfProtection = csrf({ cookie: false });
 
 export const AuthRouter = Router();
 
@@ -27,7 +27,7 @@ AuthRouter.get(
  **/
 AuthRouter.get(
     "/signin",
-    this.csrfProtection,
+    csrfProtection,
     AuthController.getSignIn)
 
 /**
@@ -43,19 +43,19 @@ AuthRouter.post(
  * @api {get} /auth/signup Get Sign up information
  * @apiGroup Auth
  **/
-AuthRouter.get(
-    "/signup",
-    this.csrfProtection,
-    AuthController.getSignUp)
+// AuthRouter.get(
+//     "/signup",
+//     csrfProtection,
+//     AuthController.getSignUp)
 
 /**
  * @api {post} /auth/signup Post Sign up validation
  * @apiGroup Auth
  **/
-AuthRouter.post(
-    "/signup",
-    /*this.csrfProtection,*/
-    AuthController.postSignUp)
+// AuthRouter.post(
+//     "/signup",
+//     /*this.csrfProtection,*/
+//     AuthController.postSignUp)
 
 /**
  * @api {get} /auth/signout Get Sign out
@@ -63,7 +63,7 @@ AuthRouter.post(
  **/
 AuthRouter.post(
     "/signout",
-    this.csrfProtection,
+    csrfProtection,
     AuthController.getSignOut)
 
 
@@ -73,7 +73,7 @@ AuthRouter.post(
  **/
 AuthRouter.post(
     "/signout",
-    this.csrfProtection,
+    csrfProtection,
     AuthController.postSignOut)
 
 /**
@@ -82,7 +82,7 @@ AuthRouter.post(
  **/
 AuthRouter.get(
     "/consent",
-    this.csrfProtection,
+    csrfProtection,
     AuthController.getConsent)
 
 /**

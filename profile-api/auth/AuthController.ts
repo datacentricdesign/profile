@@ -3,7 +3,7 @@ import * as url from "url"
 
 import { PersonService } from "../person/PersonService"
 
-import { hydra } from "./hydra"
+// import { hydra } from "./hydra"
 import config from "../config";
 import { DTOPerson } from "@datacentricdesign/types";
 
@@ -12,11 +12,16 @@ import { AuthRouter } from "./AuthRouter";
 import { PolicyService } from "./services/PolicyService";
 import { AuthService } from "./services/AuthService";
 
+
+import { AxiosResponse } from 'axios'
+import { AdminApi, CompletedRequest, LoginRequest } from '@ory/hydra-client'
+
 export class AuthController {
 
     static authService = new AuthService();
     static policyService = new PolicyService();
     static personService = new PersonService();
+
 
     static apiHealth = async (req: Request, res: Response) => {
         res.send({ status: "OK" });
@@ -31,15 +36,16 @@ export class AuthController {
 
         // The challenge is used to fetch information
         // about the login request from ORY Hydra.
-        const challenge = query.login_challenge;
+        const challenge = query.login_challenge as string;
 
+        const hydra = new AdminApi()
         hydra.getLoginRequest(challenge)
             // This will be called if the HTTP request was successful
-            .then(response => {
+            .then((response: AxiosResponse<LoginRequest>) => {
                 // If hydra was already able to authenticate the user,
                 // skip will be true and we do not need to re-authenticate
                 // the user.
-                if (response.skip) {
+                if (response.data.skip) {
                     // You can apply logic here, for example update
                     // the number of times the user logged in.
 
@@ -50,12 +56,12 @@ export class AuthController {
                         hydra
                             // Confirm we indeed want to log in the user
                             .acceptLoginRequest(challenge, {
-                                subject: response.subject
+                                subject: response.data.subject
                             })
                             // Redirect the user back to hydra
                             .then(response => {
                                 res.json({
-                                    redirect_to: response.redirect_to
+                                    redirect_to: response.data.redirect_to
                                 }
                                 );
                             })
@@ -67,7 +73,7 @@ export class AuthController {
                     csrfToken: req.csrfToken(),
                     challenge: challenge,
                     error: {},
-                    client: response.client
+                    client: response.data.client
                 })
             })
             // This will handle any error that happens
@@ -78,120 +84,174 @@ export class AuthController {
     /**
      * Sign in - Post info
      */
+    // static postSignIn = async (req: Request, res: Response, next: Function) => {
+    //     // The challenge is now a hidden input field,
+    //     // so let's take it from the request body instead
+    //     AuthController.personService.checkPerson(req.body.email, req.body.password)
+    //         .then(userId => {
+    //             console.log(userId)
+    //             // Tell hydra to login this user
+    //             if (userId !== undefined) {
+    //                 req.context = {
+    //                     userId: userId
+    //                 }
+    //                 login(req, res, next);
+    //             } else {
+    //                 // Invalid user credentials, show the ui again
+    //                 const jsonError = {
+    //                     message: "The email / password combination is not correct"
+    //                 };
+
+    //                 res.json({
+    //                     baseUrl: config.http.baseUrl,
+    //                     // csrfToken: req.csrfToken(),
+    //                     challenge: req.body.challenge,
+    //                     error: jsonError
+    //                 })
+    //             }
+    //         })
+    //         .catch(error => {
+
+    //             console.log(error)
+    //             next(error)
+    //         });
+    // }
+
+
     static postSignIn = async (req: Request, res: Response, next: Function) => {
-        // The challenge is now a hidden input field,
-        // so let's take it from the request body instead
-        console.log("postSignIn")
-        AuthController.personService.checkPerson(req.body.email, req.body.password)
-            .then(userId => {
-                console.log(userId)
-                // Tell hydra to login this user
-                if (userId !== undefined) {
-                    req.context = {
-                        userId: userId
-                    }
-                    login(req, res, next);
-                } else {
-                    // Invalid user credentials, show the ui again
-                    const jsonError = {
-                        message: "The email / password combination is not correct"
-                    };
+        const hydra = new AdminApi()
+        // Seems like the user authenticated! Let's tell hydra...
+        hydra.acceptLoginRequest(req.body.challenge, {
+            // Subject is an alias for user ID. A subject can be a random string,
+            // a UUID, an email address, ....
+            subject: req.context.userId,
 
-                    res.json({
-                        baseUrl: config.http.baseUrl,
-                        // csrfToken: req.csrfToken(),
-                        challenge: req.body.challenge,
-                        error: jsonError
-                    })
+            // This tells hydra to remember the browser and automatically
+            // set the "skip" parameter in the other
+            // route to true on subsequent requests!
+            remember: Boolean(req.body.remember),
+
+            // When the session expires, in seconds. Set this to 0
+            // so it will never expire.
+            remember_for: 3600
+
+            // Sets which "level" (e.g. 2-factor authentication) of
+            // authentication the user has. The value is really arbitrary
+            // and optional. In the context of OpenID Connect, a value
+            // of 0 indicates the lowest authorization level.
+            // acr: '0',
+        })
+            .then((response: AxiosResponse<CompletedRequest>) => {
+                // req.session.subject = req.subject;
+                // All we need to do now is to redirect the
+                // user back to hydra!
+                res.json({
+                    redirect_to: response.data.redirect_to
                 }
+                );
             })
-            .catch(error => {
+            // This will handle any error that happens when making
+            // HTTP calls to hydra
+            .catch(error => next(error));
 
-                console.log(error)
-                next(error)
-            });
+        // You could also deny the login request which tells hydra
+        // that no one authenticated!
+        // hydra.rejectLoginRequest(challenge, {
+        //   error: 'invalid_request',
+        //   error_description: 'The user did something stupid...'
+        // })
+        //   .then(function (response) {
+        //     // All we need to do now is to
+        //     // redirect the browser back to hydra!
+        //     res.redirect(response.redirect_to);
+        //   })
+        //   // This will handle any error that happens when making
+        //   // HTTP calls to hydra
+        //   .catch(function (error) {
+        //     next(error);
+        //   });
     }
 
     /**
      * Sign up - Get info
      */
-    static getSignUp = async (req: Request, res: Response, next: Function) => {
-        // Parses the URL query
-        const query = url.parse(req.url, true).query;
+    // static getSignUp = async (req: Request, res: Response, next: Function) => {
+    //     // Parses the URL query
+    //     const query = url.parse(req.url, true).query;
 
-        // The challenge is used to fetch information
-        // about the login request from ORY Hydra.
-        const challenge = query.login_challenge;
+    //     // The challenge is used to fetch information
+    //     // about the login request from ORY Hydra.
+    //     const challenge = query.login_challenge;
 
-        hydra
-            .getLoginRequest(challenge)
-            // This will be called if the HTTP request was successful
-            .then(response => {
-                // If hydra was already able to authenticate the user,
-                // skip will be true and we do not need to re-authenticate
-                // the user.
-                if (response.skip) {
-                    // Now it's time to grant the login request. You could also
-                    // deny the request if something went terribly wrong
-                    return hydra
-                        .acceptLoginRequest(challenge, {
-                            // All we need to do is to confirm that we indeed
-                            // want to log in the user.
-                            subject: response.subject
-                        })
-                        .then(response => {
-                            // All we need to do now is to redirect the user
-                            // back to hydra!
-                            res.json({
-                                redirect_to: response.redirect_to
-                            }
-                            );
-                        });
-                }
+    //     hydra
+    //         .getLoginRequest(challenge)
+    //         // This will be called if the HTTP request was successful
+    //         .then(response => {
+    //             // If hydra was already able to authenticate the user,
+    //             // skip will be true and we do not need to re-authenticate
+    //             // the user.
+    //             if (response.skip) {
+    //                 // Now it's time to grant the login request. You could also
+    //                 // deny the request if something went terribly wrong
+    //                 return hydra
+    //                     .acceptLoginRequest(challenge, {
+    //                         // All we need to do is to confirm that we indeed
+    //                         // want to log in the user.
+    //                         subject: response.subject
+    //                     })
+    //                     .then(response => {
+    //                         // All we need to do now is to redirect the user
+    //                         // back to hydra!
+    //                         res.json({
+    //                             redirect_to: response.redirect_to
+    //                         }
+    //                         );
+    //                     });
+    //             }
 
-                // If authentication can't be skipped
-                // we MUST show the sign up UI.
-                res.json({
-                    baseUrl: config.http.baseUrl,
-                    csrfToken: req.csrfToken(),
-                    challenge: challenge,
-                    error: {},
-                    client: response.client
-                })
-            })
-            // This will handle any error that happens
-            // when making HTTP calls to hydra
-            .catch(error => next(error));
-    }
+    //             // If authentication can't be skipped
+    //             // we MUST show the sign up UI.
+    //             res.json({
+    //                 baseUrl: config.http.baseUrl,
+    //                 csrfToken: req.csrfToken(),
+    //                 challenge: challenge,
+    //                 error: {},
+    //                 client: response.client
+    //             })
+    //         })
+    //         // This will handle any error that happens
+    //         // when making HTTP calls to hydra
+    //         .catch(error => next(error));
+    // }
 
 
     /**
      * Sign up - Post info
      */
-    static postSignUp = async (req: Request, res: Response, next: Function) => {
-        const url = config.http.url + "/persons";
-        const person: DTOPerson = {
-            id: req.body.id,
-            email: req.body.email,
-            name: req.body.name,
-            password: req.body.password
-        };
-        AuthController.personService.createNewPerson(person)
-            .then(person => {
-                req.context = {
-                    userId: person.id
-                }
-                login(req, res, next);
-            })
-            .catch(error => {
-                res.json({
-                    baseUrl: config.http.baseUrl,
-                    // csrfToken: req.csrfToken(),
-                    challenge: req.body.challenge,
-                    error: error
-                })
-            });
-    }
+    // static postSignUp = async (req: Request, res: Response, next: Function) => {
+    //     // const url = config.http.url + "/persons";
+    //     // const person: DTOPerson = {
+    //     //     id: req.body.id,
+    //     //     email: req.body.email,
+    //     //     name: req.body.name,
+    //     //     password: req.body.password
+    //     // };
+    //     AuthController.personService.createNewPerson(person)
+    //         .then(person => {
+    //             req.context = {
+    //                 userId: person.id
+    //             }
+    //             login(req, res, next);
+    //         })
+    //         .catch(error => {
+    //             res.json({
+    //                 baseUrl: config.http.baseUrl,
+    //                 // csrfToken: req.csrfToken(),
+    //                 challenge: req.body.challenge,
+    //                 error: error
+    //             })
+    //         });
+    // }
 
     /**
      * Get Sign out
@@ -201,14 +261,13 @@ export class AuthController {
         const query = url.parse(req.url, true).query;
 
         // The challenge is used to fetch information about the logout request from ORY Hydra.
-        const challenge = query.logout_challenge;
+        const challenge = query.logout_challenge as string;
+        const hydra = new AdminApi()
 
-        hydra
-            .getLogoutRequest(challenge)
+        hydra.getLogoutRequest(challenge)
             // This will be called if the HTTP request was successful
             .then(response => {
                 // Here we have access to e.g. response.subject, response.sid, ...
-
                 // The most secure way to perform a logout request is by asking the user if he/she really want to log out.
                 res.json({
                     csrfToken: req.csrfToken(),
@@ -226,6 +285,8 @@ export class AuthController {
     static postSignOut = async (req: Request, res: Response, next: Function) => {
         // The challenge is now a hidden input field, so let's take it from the request body instead
         const challenge = req.body.challenge;
+
+        const hydra = new AdminApi()
 
         if (req.body.submit === "No") {
             return (
@@ -248,10 +309,10 @@ export class AuthController {
         // The user agreed to log out, let's accept the logout request.
         hydra
             .acceptLogoutRequest(challenge)
-            .then(function (response) {
+            .then( (response: AxiosResponse<CompletedRequest>) => {
                 // All we need to do now is to redirect the user back to hydra!
                 res.json({
-                    redirect_to: response.redirect_to
+                    redirect_to: response.data.redirect_to
                 }
                 );
             })
@@ -271,8 +332,9 @@ export class AuthController {
 
         // The challenge is used to fetch information
         // about the consent request from ORY Hydra.
-        const challenge = query.consent_challenge;
+        const challenge = query.consent_challenge as string;
 
+        const hydra = new AdminApi()
         hydra
             .getConsentRequest(challenge)
             // This will be called if the HTTP request was successful
@@ -280,14 +342,14 @@ export class AuthController {
                 // If a user has granted this application the requested scope,
                 // hydra will tell us to not show the UI.
                 if (
-                    response.skip ||
-                    config.oauth2.firstPartyApps.includes(response.client.client_id)
+                    response.data.skip ||
+                    config.oauth2.firstPartyApps.includes(response.data.client.client_id)
                 ) {
                     // You can apply logic here, for example grant
                     // another scope, or do whatever...
 
                     // If consent can't be skipped we MUST show the consent UI.
-                    return AuthController.personService.getOnePersonById(response.subject)
+                    return AuthController.personService.getOnePersonById(response.data.subject)
                         .then(person => {
                             // Now it's time to grant the consent request. You could also
                             // deny the request if something went terribly wrong
@@ -296,10 +358,10 @@ export class AuthController {
                                     // We can grant all scopes that have been requested,
                                     // hydra already checked for us that no additional scopes
                                     // are requested accidentally.
-                                    grant_scope: response.requested_scope,
+                                    grant_scope: response.data.requested_scope,
 
                                     grant_access_token_audience:
-                                        response.requested_access_token_audience,
+                                        response.data.requested_access_token_audience,
 
                                     // The session allows us to set session data
                                     // for id and access tokens
@@ -311,7 +373,7 @@ export class AuthController {
 
                                         // This data will be available in the ID token.
                                         id_token: buildIDToken(
-                                            response.requested_scope,
+                                            response.data.requested_scope,
                                             person
                                         )
                                     }
@@ -320,7 +382,7 @@ export class AuthController {
                                     // All we need to do now is to redirect the
                                     // user back to hydra!
                                     res.json({
-                                        redirect_to: response.redirect_to
+                                        redirect_to: response.data.redirect_to
                                     }
                                     );
                                 });
@@ -328,18 +390,18 @@ export class AuthController {
                 }
 
                 // If consent can't be skipped we MUST show the consent UI.
-                return AuthController.personService.getOnePersonById(response.subject)
-                    .then(person => {
+                // return AuthController.personService.getOnePersonById(response.data.subject)
+                //     .then(person => {
                         res.json({
                             baseUrl: config.http.baseUrl,
                             csrfToken: req.csrfToken(),
                             challenge: challenge,
-                            requested_scope: AuthController.authService.buildDetailedScopes(response.requested_scope),
-                            scopes: response.requested_scope.join(","),
-                            user: person,
-                            client: response.client
+                            requested_scope: AuthController.authService.buildDetailedScopes(response.data.requested_scope),
+                            scopes: response.data.requested_scope.join(","),
+                            // user: person,
+                            client: response.data.client
                         });
-                    })
+                    // })
             })
             // This will handle any error that happens
             // when making HTTP calls to hydra
@@ -353,6 +415,7 @@ export class AuthController {
         // The challenge is now a hidden input field, so let's take it
         // from the request body instead
         const challenge = req.body.challenge;
+        const hydra = new AdminApi()
 
         // Let's see if the user decided to accept or reject the consent request..
         if (req.body.submit === "Deny access") {
@@ -367,7 +430,7 @@ export class AuthController {
                         // All we need to do now is to redirect
                         // the browser back to hydra!
                         res.json({
-                            redirect_to: response.redirect_to
+                            redirect_to: response.data.redirect_to
                         }
                         );
                     })
@@ -411,7 +474,7 @@ export class AuthController {
             .then(response => {
                 // All we need to do now is to redirect the user back to hydra!
                 res.json({
-                    redirect_to: response.redirect_to
+                    redirect_to: response.data.redirect_to
                 }
                 );
             })
@@ -421,60 +484,6 @@ export class AuthController {
     }
 
 }
-
-function login(req, res, next) {
-    // Seems like the user authenticated! Let's tell hydra...
-    hydra.acceptLoginRequest(req.body.challenge, {
-        // Subject is an alias for user ID. A subject can be a random string,
-        // a UUID, an email address, ....
-        subject: req.context.userId,
-
-        // This tells hydra to remember the browser and automatically
-        // set the "skip" parameter in the other
-        // route to true on subsequent requests!
-        remember: Boolean(req.body.remember),
-
-        // When the session expires, in seconds. Set this to 0
-        // so it will never expire.
-        remember_for: 3600
-
-        // Sets which "level" (e.g. 2-factor authentication) of
-        // authentication the user has. The value is really arbitrary
-        // and optional. In the context of OpenID Connect, a value
-        // of 0 indicates the lowest authorization level.
-        // acr: '0',
-    })
-        .then(response => {
-            // req.session.subject = req.subject;
-            // All we need to do now is to redirect the
-            // user back to hydra!
-            res.json({
-                redirect_to: response.redirect_to
-            }
-            );
-        })
-        // This will handle any error that happens when making
-        // HTTP calls to hydra
-        .catch(error => next(error));
-
-    // You could also deny the login request which tells hydra
-    // that no one authenticated!
-    // hydra.rejectLoginRequest(challenge, {
-    //   error: 'invalid_request',
-    //   error_description: 'The user did something stupid...'
-    // })
-    //   .then(function (response) {
-    //     // All we need to do now is to
-    //     // redirect the browser back to hydra!
-    //     res.redirect(response.redirect_to);
-    //   })
-    //   // This will handle any error that happens when making
-    //   // HTTP calls to hydra
-    //   .catch(function (error) {
-    //     next(error);
-    //   });
-}
-
 
 function buildIDToken(grant_scope: string[], user) {
     const idToken: any = {};
